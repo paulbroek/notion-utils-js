@@ -1,0 +1,35 @@
+{
+  "name": "notion-utils",
+  "version": "1.0.0",
+  "description": "utility library for Notion",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node ./dist/index.js",
+    "build": "tsc -p .",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulbroek/notion-utils-js.git"
+  },
+  "keywords": [
+    "notion",
+    "node",
+    "js",
+    "api",
+    "rest"
+  ],
+  "author": "Paul Broek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/paulbroek/notion-utils-js/issues"
+  },
+  "homepage": "https://github.com/paulbroek/notion-utils-js#readme",
+  "dependencies": {
+    "@notionhq/client": "^2.2.1",
+    "dotenv": "^16.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}
