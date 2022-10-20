@@ -10,3 +10,15 @@ services:
       NODE_ENV: production
     env_file:
       - .env
+    command: node ./dist/index.js
+
+  telegram-bot:
+    image: telegram-bot
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    env_file:
+      - .env
+    command: node ./dist/telegram-bot.js

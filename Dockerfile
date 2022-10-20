@@ -11,5 +11,5 @@ RUN npm run build
 USER node
 # CMD ["node", "index.ts"]
 # CMD ["node", "-r", "ts-node/register", "index.ts"]
-CMD ["node", "./dist/index.js"]
+# CMD ["node", "./dist/index.js"]
 # ts-node ./dist/index.js

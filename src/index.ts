@@ -1,20 +1,10 @@
-// const path = require("path");
-// import path from "path";
-// require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-// import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 import { Client } from "@notionhq/client";
-// import dotenv from "dotenv";
-// dotenv.config();
 // console.log("key: ", process.env.NOTION_API_KEY);
-console.log("process.env: ", process.env);
+// console.log("process.env: ", process.env);
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 (async () => {
-  // const pageId = "801cb6e570304bd89dfb3a2a3adbbeec";
-  const pageId =
-    "https://www.notion.so/Book-summaries-801cb6e570304bd89dfb3a2a3adbbeec";
-  // const pageId =
-  //   "https://arrow-inch-f1e.notion.site/Book-summaries-801cb6e570304bd89dfb3a2a3adbbeec";
+  const pageId = process.env.NOTION_PAGE_ID as string;
   const response = await notion.pages.retrieve({ page_id: pageId });
   console.log(response);
 })();
