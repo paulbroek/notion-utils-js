@@ -16,10 +16,10 @@ NOTION_PAGE_ID=...
 NOTION_DATABASE_ID=...
 ```
 
-## 1.1 Install
+## 1.1 Install and run
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 
 ## 1.2 Inspect

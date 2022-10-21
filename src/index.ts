@@ -15,6 +15,7 @@ const databaseId = process.env.NOTION_DATABASE_ID as string;
 
 const addSummaryToTable = async (item: bookScrapeItem) => {
   // const { id } = await notion.pages.create({
+  // TODO: check if book exists in table
   const response: CreatePageResponse = await notion.pages.create({
     cover: {
       type: "external",
@@ -49,6 +50,15 @@ const addSummaryToTable = async (item: bookScrapeItem) => {
           },
         ],
       },
+      // isbn: {
+      //   rich_text: [
+      //     {
+      //       text: {
+      //         content: item.isbn,
+      //       },
+      //     },
+      //   ],
+      // },
     },
     // the actual summary..
     // children: [
