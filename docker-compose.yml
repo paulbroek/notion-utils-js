@@ -17,6 +17,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    restart: always
     environment:
       NODE_ENV: production
     env_file:
