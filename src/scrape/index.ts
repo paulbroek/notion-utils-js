@@ -19,12 +19,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
-  // let page;
-  // try {
-  // } catch (error) {
-  //   console.error(`cannot load page with puppeteer. error: ${error}`);
-  //   return null;
-  // }
 
   try {
     await page.goto(url, {
@@ -35,7 +29,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     return null;
   }
 
-  // try {
   const scrapeItem: null | bookScrapeItem = await page.evaluate(() => {
     if (!document.querySelector("#coverImage")) {
       console.error("could not locate content of page");
@@ -48,13 +41,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       .innerText;
     const author = (document.querySelector(".authorName") as HTMLElement)
       .innerText;
-    // const isbn = extractNumberFromString(
-    //   (
-    //     document.querySelector(
-    //       "#bookDataBox > div:nth-child(1) > div.infoBoxRowItem"
-    //     ) as HTMLElement
-    //   ).innerText
-    // );
     const isbnElement = document.querySelector(
       "#bookDataBox > div.clearFloats > div.infoBoxRowItem"
     ) as HTMLElement;
@@ -68,10 +54,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   });
 
   return scrapeItem;
-  // } catch (error) {
-  //   console.error("error scraping page: ", error);
-  // }
-  // return null;
 };
 
 export default scrapeBook;
