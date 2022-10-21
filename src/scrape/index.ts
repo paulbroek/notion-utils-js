@@ -5,7 +5,13 @@ import { bookScrapeItem } from "../models/bookScrapeItem";
 const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   console.log("Warming up a scrapper");
 
-  const browser = await puppeteer.launch();
+  // const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: true });
+  // const browser = await puppeteer.launch({
+  //   headless: false,
+  //   executablePath:
+  //     "/home/paul/.cache/puppeteer/chrome/linux-1045629/chrome-linux/chrome",
+  // });
   const page = await browser.newPage();
 
   try {
@@ -23,9 +29,9 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   //   const results = [];
 
   const scrapeItem: bookScrapeItem = await page.evaluate(() => {
-    // const cover = (
-    //   document.querySelector("#coverImage") as HTMLElement
-    // ).getAttribute("src");
+    const cover = (
+      document.querySelector("#coverImage") as HTMLElement
+    ).getAttribute("src");
     const title = (document.querySelector("#bookTitle") as HTMLElement)
       .innerText;
     const author = (document.querySelector(".authorName") as HTMLElement)

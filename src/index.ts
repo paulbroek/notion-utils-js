@@ -7,10 +7,10 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const pageId = process.env.NOTION_PAGE_ID as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
 
-(async () => {
-  const response = await notion.pages.retrieve({ page_id: pageId });
-  console.log(response);
-})();
+// (async () => {
+//   const response = await notion.pages.retrieve({ page_id: pageId });
+//   console.log(response);
+// })();
 
 const addSummaryToTable = async (item: bookScrapeItem) => {
   const response = await notion.pages.create({
