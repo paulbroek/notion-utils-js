@@ -5,30 +5,17 @@ import { bookScrapeItem } from "../models/bookScrapeItem";
 const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   console.log("Warming up a scrapper");
 
-  // const browser = await puppeteer.launch();
-  // const browser = await puppeteer.launch({ headless: true });
-  // TODO: case in docker and case without
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
-  // const browser = await puppeteer.launch({
-  //   headless: false,
-  //   executablePath:
-  //     "~/.cache/puppeteer/chrome/linux-1045629/chrome-linux/chrome",
-  // });
-  // const browser = await puppeteer.launch({
-  //   headless: false,
-  //   executablePath:
-  //     "/home/paul/.cache/puppeteer/chrome/linux-1045629/chrome-linux/chrome",
-  // });
-  let page;
-  try {
-    page = await browser.newPage();
-  } catch (error) {
-    console.error(`cannot load page with puppeteer. error: ${error}`);
-    return null;
-  }
+  const page = await browser.newPage();
+  // let page;
+  // try {
+  // } catch (error) {
+  //   console.error(`cannot load page with puppeteer. error: ${error}`);
+  //   return null;
+  // }
 
   try {
     await page.goto(url, {
@@ -38,11 +25,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     console.error(`cannot visit url: ${url}. error: ${error}`);
     return null;
   }
-  //   await page.goto("https://www.goodreads.com/choiceawards/best-books-2018", {
-  //     waitUntil: "domcontentloaded",
-  //   });
-
-  //   const results = [];
 
   const scrapeItem: bookScrapeItem = await page.evaluate(() => {
     const cover = (
