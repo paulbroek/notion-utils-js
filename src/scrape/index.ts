@@ -1,7 +1,8 @@
 // from: https://github.com/dmtrbrl/goodreads-web-scraping/blob/master/index.js
 import puppeteer from "puppeteer";
+import { bookScrapeItem } from "../models/bookScrapeItem";
 
-const scrapeBook = async (url) => {
+const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   console.log("Warming up a scrapper");
 
   const browser = await puppeteer.launch();
@@ -13,7 +14,7 @@ const scrapeBook = async (url) => {
     });
   } catch (error) {
     console.error(`cannot visit url: ${url}`);
-    return;
+    return null;
   }
   //   await page.goto("https://www.goodreads.com/choiceawards/best-books-2018", {
   //     waitUntil: "domcontentloaded",
@@ -21,7 +22,7 @@ const scrapeBook = async (url) => {
 
   //   const results = [];
 
-  const bookProps = await page.evaluate(() => {
+  const scrapeItem: bookScrapeItem = await page.evaluate(() => {
     // const cover = (
     //   document.querySelector("#coverImage") as HTMLElement
     // ).getAttribute("src");
@@ -29,12 +30,14 @@ const scrapeBook = async (url) => {
       .innerText;
     const author = (document.querySelector(".authorName") as HTMLElement)
       .innerText;
-    const year = undefined;
-    // const year = (document.querySelector("#details") as HTMLElement).innerText;
-    return { title, author, year };
+    const published = "";
+    // const published = (document.querySelector("#details") as HTMLElement).innerText;
+    console.log("got item");
+    const res: bookScrapeItem = { title, author, published };
+    return res;
   });
 
-  return bookProps;
+  return scrapeItem;
   //   const categoriesNames = await page.$$eval(".category h4", (names) =>
   //     names.map((name) => name.innerText)
   //   );

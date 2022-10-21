@@ -7,7 +7,7 @@ Includes a Telegram bot for creating content by interacting with the bot.
 
 ## 1.0 Config
 
-Create `.env` file containing \
+Create `.env` file containing
 
 ```vim
 NOTION_API_KEY=...
