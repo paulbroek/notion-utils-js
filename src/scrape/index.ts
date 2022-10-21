@@ -6,20 +6,36 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   console.log("Warming up a scrapper");
 
   // const browser = await puppeteer.launch();
-  const browser = await puppeteer.launch({ headless: true });
+  // const browser = await puppeteer.launch({ headless: true });
+  // TODO: case in docker and case without
+  const browser = await puppeteer.launch({
+    executablePath: "/usr/bin/google-chrome",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+  // const browser = await puppeteer.launch({
+  //   headless: false,
+  //   executablePath:
+  //     "~/.cache/puppeteer/chrome/linux-1045629/chrome-linux/chrome",
+  // });
   // const browser = await puppeteer.launch({
   //   headless: false,
   //   executablePath:
   //     "/home/paul/.cache/puppeteer/chrome/linux-1045629/chrome-linux/chrome",
   // });
-  const page = await browser.newPage();
+  let page;
+  try {
+    page = await browser.newPage();
+  } catch (error) {
+    console.error(`cannot load page with puppeteer. error: ${error}`);
+    return null;
+  }
 
   try {
     await page.goto(url, {
       waitUntil: "domcontentloaded",
     });
   } catch (error) {
-    console.error(`cannot visit url: ${url}`);
+    console.error(`cannot visit url: ${url}. error: ${error}`);
     return null;
   }
   //   await page.goto("https://www.goodreads.com/choiceawards/best-books-2018", {
@@ -37,6 +53,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     const author = (document.querySelector(".authorName") as HTMLElement)
       .innerText;
     const published = "";
+    // TODO: scrape `published`
     // const published = (document.querySelector("#details") as HTMLElement).innerText;
     console.log("got item");
     const res: bookScrapeItem = { title, author, published };
@@ -44,61 +61,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   });
 
   return scrapeItem;
-  //   const categoriesNames = await page.$$eval(".category h4", (names) =>
-  //     names.map((name) => name.innerText)
-  //   );
-
-  //   categoriesNames.forEach((name) => results.push({ category: name }));
-
-  //   const categoriesLinks = await page.$$eval(".category > a", (links) =>
-  //     links.map((link) => link.href)
-  //   );
-
-  //   Bar.init(categoriesNames.length);
-
-  //   for (let i = 0; i < categoriesLinks.length; i++) {
-  //     const books = [];
-  //     await page.goto(categoriesLinks[i], {
-  //       waitUntil: "domcontentloaded",
-  //     });
-
-  //     const booksVotes = await page.$$eval(
-  //       ".pollAnswer > .result:first-child",
-  //       (votes) =>
-  //         votes.map((result) =>
-  //           parseInt(result.innerText.split(" ")[0].replace(",", ""))
-  //         )
-  //     );
-  //     booksVotes.forEach((votes) => books.push({ votes }));
-
-  //     const booksLinks = await page.$$eval(".pollAnswer__bookLink", (links) =>
-  //       links.map((link) => link.href)
-  //     );
-  //     for (let j = 0; j < booksLinks.length; j++) {
-  //       await page.goto(booksLinks[j], {
-  //         waitUntil: "domcontentloaded",
-  //       });
-  //       const bookProps = await page.evaluate(() => {
-  //         const cover = document.querySelector("#coverImage").getAttribute("src");
-  //         const title = document.querySelector("#bookTitle").innerText;
-  //         const author = document.querySelector(".authorName").innerText;
-  //         return { cover, title, author };
-  //       });
-  //       books[j] = Object.assign(bookProps, books[j]);
-  //       Bar.update(i + (1 / booksLinks.length) * (j + 1));
-  //     }
-
-  //     results[i].books = books;
-  //   }
-
-  //   fs.writeFile("results.json", JSON.stringify(results), function (err) {
-  //     if (err) throw err;
-  //     process.stdout.clearLine();
-  //     process.stdout.cursorTo(0);
-  //     console.log("Complete!");
-  //     browser.close();
-  //   });
 };
-// ();
 
 export default scrapeBook;

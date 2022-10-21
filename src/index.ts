@@ -1,5 +1,6 @@
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
+import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
 // console.log("key: ", process.env.NOTION_API_KEY);
 // console.log("process.env: ", process.env);
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
@@ -7,13 +8,14 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const pageId = process.env.NOTION_PAGE_ID as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
 
-// (async () => {
-//   const response = await notion.pages.retrieve({ page_id: pageId });
-//   console.log(response);
-// })();
+(async () => {
+  const response = await notion.pages.retrieve({ page_id: pageId });
+  console.log(response);
+})();
 
 const addSummaryToTable = async (item: bookScrapeItem) => {
-  const response = await notion.pages.create({
+  // const { id } = await notion.pages.create({
+  const response: CreatePageResponse = await notion.pages.create({
     cover: {
       type: "external",
       external: {
@@ -47,11 +49,6 @@ const addSummaryToTable = async (item: bookScrapeItem) => {
           },
         ],
       },
-      // "Food group": {
-      //   select: {
-      //     name: "🥬 Vegetable",
-      //   },
-      // },
     },
     // the actual summary..
     // children: [
@@ -87,9 +84,10 @@ const addSummaryToTable = async (item: bookScrapeItem) => {
     //   },
     // ],
   });
+
   console.log(response);
+  return response;
 };
-// )();
 
 // const databaseId = process.env.NOTION_DATABASE_ID
 

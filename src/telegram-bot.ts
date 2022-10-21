@@ -44,9 +44,23 @@ bot.on("text", async (ctx) => {
   // create notion page, ask user first
   if (res) {
     ctx.reply("creating record in Notion table..");
-    await addSummaryToTable(res);
+    const addResult = await addSummaryToTable(res);
+
+    if (!addResult) {
+      console.log("could not add result to Notion");
+      // TODO: retry automatically?
+    } else {
+      // console.log("addResult: ", JSON.stringify(addResult));
+      // FIXME: very ugly method, but notion API does not allow to see properties of response directly
+      // See: https://github.com/makenotion/notion-sdk-js/issues/247
+
+      const recreatedObject = JSON.parse(JSON.stringify(addResult));
+      console.log("addResult.reparsed: ", recreatedObject.url);
+      ctx.reply(`visit the summary at: ${recreatedObject.url}`);
+    }
+  } else {
+    ctx.reply("could not scrape goodreads page");
   }
-  // TODO: send url of page to user
 });
 
 // TODO: ask user to optionally add reminders, they will be set in Notion
