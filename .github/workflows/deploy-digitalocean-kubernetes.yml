@@ -2,19 +2,20 @@ name: Kubernetes deploy
 
 # runs after deploying image to ghcr
 on:
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     # - "config/**"
-  #     - "src/**"
-  #     - "Dockerfile"
-  #     - ".github/workflows/**"
-  workflow_run:
-    workflows: ["Docker push"]
-    branches: [main]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+    paths:
+      # - "config/**"
+      - "src/**"
+      - "Dockerfile"
+      - ".github/workflows/**"
+
+  # workflow_run:
+  #   workflows: ["Docker push"]
+  #   branches: [main]
+  #   types:
+  #     - completed
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -56,7 +57,7 @@ jobs:
           echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
           echo NOTION_PAGE_ID=${{ secrets.NOTION_PAGE_ID }} >> .env
           echo NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }} >> .env
-          cat .env
+          source .env
 
       - name: Update deployment file
         # run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/asb/static-example:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
