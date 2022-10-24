@@ -30,6 +30,8 @@ spec:
               cpu: 100m
               memory: 128Mi
           env:
+            - name: NODE_ENV
+              value: production
             - name: NOTION_API_KEY
               value: <NOTION_API_KEY>
             - name: TELEGRAM_BOT_TOKEN
