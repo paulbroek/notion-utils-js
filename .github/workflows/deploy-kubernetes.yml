@@ -76,7 +76,7 @@ jobs:
         run: TAG=main && sed -i 's|<IMAGE>|ghcr.io/paulbroek/notion-utils-js:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ DIGITAL_OCEAN_CLUSTER_NAME }}
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.DIGITAL_OCEAN_CLUSTER_NAME }}
 
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
