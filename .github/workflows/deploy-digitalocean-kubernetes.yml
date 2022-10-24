@@ -27,8 +27,8 @@ jobs:
       - name: Update SHA
         run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/src/_meta
 
-      - name: Build container image
-        run: docker build -t registry.digitalocean.com/asb/static-example:$(echo $GITHUB_SHA | head -c7) .
+      # - name: Build container image
+      #   run: docker build -t registry.digitalocean.com/asb/static-example:$(echo $GITHUB_SHA | head -c7) .
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -47,7 +47,7 @@ jobs:
         run: TAG=$(echo $GITHUB_SHA) && sed -i 's|<IMAGE>|ghcr.io/paulbroek/notion-utils-js:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 actions-example-k8s-1-18
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-1-24-4-do-0-ams3-1666623075367
 
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
