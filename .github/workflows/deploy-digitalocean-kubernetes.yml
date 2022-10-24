@@ -57,6 +57,7 @@ jobs:
           echo TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
           echo NOTION_PAGE_ID=${{ secrets.NOTION_PAGE_ID }} >> .env
           echo NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }} >> .env
+          # cat .env
           source .env
 
       - name: Update deployment file
