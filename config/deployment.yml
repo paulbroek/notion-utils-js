@@ -13,7 +13,7 @@ spec:
         app: notion-telegram-bot-js
     spec:
       containers:
-        - name: notion-telegrma-bot-js
+        - name: notion-telegram-bot-js
           # image: paulbroek/notion-telegram-bot-js:1.0.0
           # image: ghcr.io/paulbroek/notion-utils-js:main@sha256:1d53ccd8e4e9294ea84cf264794e214acdbb6ddd9aca932d289aa68a348b0432
           image: <IMAGE>
