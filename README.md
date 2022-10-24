@@ -27,3 +27,10 @@ docker-compose up -d --build
 ```bash
 docker-compose logs -f
 ```
+
+## 1.3 Deploy on Minikube
+
+```bash
+# kubectl create deployment notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js
+kubectl run notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js --image-pull-policy=Never
+```

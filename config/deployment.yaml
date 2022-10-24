@@ -13,11 +13,20 @@ spec:
         app: notion-telegram-bot-js
     spec:
       containers:
-        - name: app
-          image: paulbroek/notion-telegram-bot-js:1.0.0
+        - name: notion-telegrma-bot-js
+          # image: paulbroek/notion-telegram-bot-js:1.0.0
+          # image: ghcr.io/paulbroek/notion-utils-js:main@sha256:1d53ccd8e4e9294ea84cf264794e214acdbb6ddd9aca932d289aa68a348b0432
+          image: <IMAGE>
           # ports:
           #   - containerPort: 3000
           # env:
           #   - name: MONGO_URL
           #     value: mongodb://mongo:27017/dev
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
           imagePullPolicy: Always
