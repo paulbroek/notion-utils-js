@@ -2,15 +2,14 @@
 import puppeteer from "puppeteer";
 import { bookScrapeItem } from "../models/bookScrapeItem";
 
-const extractNumberFromString = (str: string): null | number => {
-  // const str = "The number 345 has three digits";
+// const extractNumberFromString = (str: string): null | number => {
+//   const matches = str.match(/\d+/);
+//   if (!matches) {
+//     return null;
+//   }
+//   return Number(matches[0]);
+// };
 
-  const matches = str.match(/\d+/);
-  if (!matches) {
-    return null;
-  }
-  return Number(matches[0]);
-};
 const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   console.log("Warming up a scrapper");
 

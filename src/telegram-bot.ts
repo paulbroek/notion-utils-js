@@ -1,5 +1,5 @@
 // TODO: move to seperate repo?
-import { Context, Markup, Telegraf } from "telegraf";
+import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBook from "./scrape";
 import { bookScrapeItem } from "./models/bookScrapeItem";
@@ -25,19 +25,8 @@ bot.command("quit", (ctx) => {
   ctx.leaveChat();
 });
 
-// bot.command("keyboard", (ctx) => {
-//   ctx.reply(
-//     "Keyboard",
-//     Markup.inlineKeyboard([
-//       Markup.button.callback("First option", "first"),
-//       Markup.button.callback("Second option", "second"),
-//     ])
-//   );
-// });
-
 bot.on("text", async (ctx) => {
   //   ctx.reply(`you send me: ${ctx.message.text}`);
-
   const url = ctx.message.text;
   const res: null | bookScrapeItem = await scrapeBook(url);
   ctx.reply(`res: ${JSON.stringify(res)}`);

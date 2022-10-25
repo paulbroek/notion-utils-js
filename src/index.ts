@@ -1,8 +1,6 @@
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
-// console.log("key: ", process.env.NOTION_API_KEY);
-// console.log("process.env: ", process.env);
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 const pageId = process.env.NOTION_PAGE_ID as string;
@@ -16,7 +14,6 @@ const databaseId = process.env.NOTION_DATABASE_ID as string;
 // })();
 
 const addSummaryToTable = async (item: bookScrapeItem) => {
-  // const { id } = await notion.pages.create({
   // TODO: check if book exists in table
   const response: CreatePageResponse = await notion.pages.create({
     cover: {
@@ -100,32 +97,5 @@ const addSummaryToTable = async (item: bookScrapeItem) => {
   console.log(response);
   return response;
 };
-
-// const databaseId = process.env.NOTION_DATABASE_ID
-
-// async function addItem(text) {
-//   try {
-//     const response = await notion.pages.create({
-//       parent: { database_id: databaseId },
-//       properties: {
-//         title: {
-//           title:[
-//             {
-//               "text": {
-//                 "content": text
-//               }
-//             }
-//           ]
-//         }
-//       },
-//     })
-//     console.log(response)
-//     console.log("Success! Entry added.")
-//   } catch (error) {
-//     console.error(error.body)
-//   }
-// }
-
-// addItem("Yurts in Big Sur, California")
 
 export { addSummaryToTable };
