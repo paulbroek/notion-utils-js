@@ -3,7 +3,7 @@ import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBook from "./scrape";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-import { addSummaryToTable } from ".";
+import { addSummaryToTable, bookExistsInTable } from ".";
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
@@ -30,9 +30,19 @@ bot.on("text", async (ctx) => {
   const url = ctx.message.text;
   const res: null | bookScrapeItem = await scrapeBook(url);
   ctx.reply(`res: ${JSON.stringify(res)}`);
+
   // create notion page, ask user first
   if (res) {
+    // check if book exists
+    const bookExists: Boolean = await bookExistsInTable(res);
+    if (bookExists) {
+      console.log("book exists");
+      ctx.reply("Book already exists in summary database");
+      return;
+    }
+
     ctx.reply("creating record in Notion table..");
+
     const addResult = await addSummaryToTable(res);
 
     if (!addResult) {

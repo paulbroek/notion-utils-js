@@ -13,8 +13,25 @@ const databaseId = process.env.NOTION_DATABASE_ID as string;
 //   console.log(response);
 // })();
 
-const addSummaryToTable = async (item: bookScrapeItem) => {
+const bookExistsInTable = async (item: bookScrapeItem): Promise<Boolean> => {
+  const response = await notion.databases.query({
+    database_id: databaseId,
+    filter: {
+      and: [
+        { property: "Author", title: { equals: item.author } },
+        { property: "Title", rich_text: { equals: item.title } },
+      ],
+    },
+  });
+  // console.log("response: ", JSON.stringify(response));
+  return response.results.length ? true : false;
+};
+
+const addSummaryToTable = async (
+  item: bookScrapeItem
+): Promise<CreatePageResponse> => {
   // TODO: check if book exists in table
+  // Use title + author
   const response: CreatePageResponse = await notion.pages.create({
     cover: {
       type: "external",
@@ -98,4 +115,4 @@ const addSummaryToTable = async (item: bookScrapeItem) => {
   return response;
 };
 
-export { addSummaryToTable };
+export { addSummaryToTable, bookExistsInTable };
