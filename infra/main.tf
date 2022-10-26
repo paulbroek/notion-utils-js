@@ -1,13 +1,3 @@
-terraform {
-  required_version = ">= 0.12"
-  required_providers {
-    digitalocean = {
-      source = "digitalocean/digitalocean"
-      version = "~> 2.0"
-    }
-  }
-}
-
 # resource "digitalocean_custom_image" "ubuntu_with_docker" {
 #   name   = "ubuntu_with_docker"
 #   url = "https://stable.release.flatcar-linux.net/amd64-usr/2605.7.0/flatcar_production_digitalocean_image.bin.bz2"
@@ -42,3 +32,11 @@ provisioner "remote-exec" {
     ]
   }
 }
+
+resource "digitalocean_project" "notion-telegram-bot" {
+    name        = "notion-telegram-bot"
+    description = "A project to represent development resources."
+    purpose     = "Web Application"
+    environment = "Production"
+    resources   = [digitalocean_droplet.www-1.urn]
+  }
