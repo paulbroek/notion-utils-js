@@ -26,7 +26,6 @@ resource "digitalocean_droplet" "www-1" {
     ssh_keys = [
       data.digitalocean_ssh_key.terraform.id
     ]
-    NOTION_API_KEY="what"
 
 connection {
     host = self.ipv4_address
@@ -42,16 +41,20 @@ provisioner "remote-exec" {
     inline = [
       "export PATH=$PATH:/usr/bin",
       # clone and deploy
-      "git clone https://github.com/paulbroek/notion-utils-js",
-      # "export NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}",
-      "echo \"export MYVAR=${var.NOTION_API_KEY}\" >> ~/.bashrc",
-      "docker-compose -f ./notion-utils-js/docker-compose.yml up -d"
+      "git clone -b dev https://github.com/paulbroek/notion-utils-js",
+      # ugly?
+      "echo \"export NOTION_API_KEY=${var.NOTION_API_KEY}\" >> ~/.bashrc",
+      "echo \"export TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> ~/.bashrc",
+      "echo \"export NOTION_PAGE_ID=${var.NOTION_PAGE_ID}\" >> ~/.bashrc",
+      "echo \"export NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> ~/.bashrc",
+      # "source ~/.bashrc",
+      # "docker-compose -f /notion-utils-js/docker-compose.yml up -d"
     ]
   }
 
 provisioner "remote-exec" {
     scripts = [
-      "./notion-utils-js/scripts/echo_var.sh"
+      "./notion-utils-js/scripts/start.sh"
     ]
   }
 }
