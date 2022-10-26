@@ -11,6 +11,7 @@ lerna-debug.log*
 
 # Terraform
 infra/.terraform
+infra/*.tfplan
 infra/*.tfstate
 infra/*.tfstate.backup
 

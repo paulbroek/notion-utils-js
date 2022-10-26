@@ -4,6 +4,19 @@
 #   regions = ["nyc3"]
 # }
 
+variable "NOTION_API_KEY" {
+    type = string
+}
+variable "TELEGRAM_BOT_TOKEN" {
+    type = string
+}
+variable "NOTION_PAGE_ID" {
+    type = string
+}
+variable "NOTION_DATABASE_ID" {
+    type = string
+}
+
 resource "digitalocean_droplet" "www-1" {
     # image = "ubuntu-20-04-x64"
     image = "docker-20-04"
@@ -13,30 +26,40 @@ resource "digitalocean_droplet" "www-1" {
     ssh_keys = [
       data.digitalocean_ssh_key.terraform.id
     ]
+    NOTION_API_KEY="what"
 
 connection {
     host = self.ipv4_address
     user = "root"
     type = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "2m"
+    timeout = "3m"
   }
+
+# NOTION_DATABASE_ID=var.NOTION_DATABASE_ID
 
 provisioner "remote-exec" {
     inline = [
       "export PATH=$PATH:/usr/bin",
-      # clone repo
+      # clone and deploy
       "git clone https://github.com/paulbroek/notion-utils-js",
-      "cd notion-utils.js",
-      "docker-compose up -d"
+      # "export NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}",
+      "echo \"export MYVAR=${var.NOTION_API_KEY}\" >> ~/.bashrc",
+      "docker-compose -f ./notion-utils-js/docker-compose.yml up -d"
+    ]
+  }
+
+provisioner "remote-exec" {
+    scripts = [
+      "./notion-utils-js/scripts/echo_var.sh"
     ]
   }
 }
 
-resource "digitalocean_project" "notion-telegram-bot" {
-    name        = "notion-telegram-bot"
-    description = "A project to represent development resources."
-    purpose     = "Web Application"
-    environment = "Production"
-    resources   = [digitalocean_droplet.www-1.urn]
-  }
+# resource "digitalocean_project" "notion-telegram-bot" {
+#     name        = "notion-telegram-bot"
+#     description = "A project to represent development resources."
+#     purpose     = "Web Application"
+#     environment = "Production"
+#     resources   = [digitalocean_droplet.www-1.urn]
+#   }
