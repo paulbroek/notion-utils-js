@@ -47,27 +47,17 @@ provisioner "remote-exec" {
       # clone and deploy
       "git clone -b dev https://github.com/paulbroek/notion-utils-js",
       # ugly?
-      "touch /root/notion-utils-js/.env"
+      "touch /root/notion-utils-js/.env",
       "echo \"NOTION_API_KEY=${var.NOTION_API_KEY}\" >> /root/notion-utils-js/.env",
       "echo \"TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> /root/notion-utils-js/.env",
       "echo \"NOTION_PAGE_ID=${var.NOTION_PAGE_ID}\" >> /root/notion-utils-js/.env",
       "echo \"NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> /root/notion-utils-js/.env",
-      # "echo \"export NOTION_API_KEY=${var.NOTION_API_KEY}\" >> ~/.bashrc",
-      # "echo \"export TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> ~/.bashrc",
-      # "echo \"export NOTION_PAGE_ID=${var.NOTION_PAGE_ID}\" >> ~/.bashrc",
-      # "echo \"export NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> ~/.bashrc",
-      # or use rsync
-      # "rsync ${} "
-      # "chmod +x /root/notion-utils-js/scripts/start.sh",
-      # "chmod 755 /root/notion-utils-js/scripts/start.sh",
-      "source ~/.bashrc",
       "docker-compose -f /root/notion-utils-js/docker-compose.yml up -d"
     ]
   }
 
 # provisioner "remote-exec" {
 #     scripts = [
-#       # "/root/notion-utils-js/scripts/start.sh"
 #       "/root/notion-utils-js/scripts/echo_var.sh"
 #     ]
 #   }
