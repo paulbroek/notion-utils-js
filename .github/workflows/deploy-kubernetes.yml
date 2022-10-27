@@ -25,6 +25,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  if: ${{ false }} # disable for now
   build:
     # name: Build, push, and deploy
     name: pull and deploy

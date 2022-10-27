@@ -20,6 +20,6 @@ services:
     restart: always
     environment:
       NODE_ENV: production
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     # command: node ./dist/telegram-bot.js
