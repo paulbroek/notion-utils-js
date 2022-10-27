@@ -61,7 +61,7 @@ provisioner "remote-exec" {
       # "chmod +x /root/notion-utils-js/scripts/start.sh",
       # "chmod 755 /root/notion-utils-js/scripts/start.sh",
       "source ~/.bashrc",
-      # "docker-compose -f /root/notion-utils-js/docker-compose.yml up -d"
+      "docker-compose -f /root/notion-utils-js/docker-compose.yml up -d"
     ]
   }
 
