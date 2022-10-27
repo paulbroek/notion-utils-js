@@ -55,3 +55,13 @@ TELEGRAM_BOT_TOKEN="..."
 NOTION_PAGE_ID="..."
 NOTION_DATABASE_ID="..."
 ```
+
+## 1.5 Destroy infrastructure (terraform)
+
+```bash
+cd ~/repos/notion-utils-js/infra
+terraform destroy -auto-approve \
+    -var "do_token=${DO_PAT}" \
+    -var "pvt_key=$HOME/.ssh/id_rsa" \
+    -var-file="secret.tfvars"
+```
