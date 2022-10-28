@@ -5,13 +5,34 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 const pageId = process.env.NOTION_PAGE_ID as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
+console.log("pageId: ", pageId);
 
 // dummy method to verify if any data can be pulled from Notion API
 
-// (async () => {
-//   const response = await notion.pages.retrieve({ page_id: pageId });
-//   console.log(response);
-// })();
+const getPage = async (pageId: string) => {
+  const response: any = await notion.pages.retrieve({ page_id: pageId });
+  console.log("response: ", response);
+  console.log("Object.keys(response): ", Object.keys(response));
+  console.log(
+    "response.properties.title.title: ",
+    response.properties.title.title
+  );
+  return response;
+};
+(async () => getPage(pageId))();
+
+// Can only fetch pages by parent page
+// const getPages = async (): Promise<null> => {};
+
+const getPageProperties = async (pageId: string, propertyId: string) => {
+  const response = await notion.pages.properties.retrieve({
+    page_id: pageId,
+    property_id: propertyId,
+  });
+  console.log("response: ", response);
+  return response;
+};
+// (async () => getPageProperties(pageId))();
 
 const bookExistsInTable = async (item: bookScrapeItem): Promise<Boolean> => {
   const response = await notion.databases.query({

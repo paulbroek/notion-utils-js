@@ -52,7 +52,7 @@ provisioner "remote-exec" {
       "echo \"TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> /root/notion-utils-js/.env",
       "echo \"NOTION_PAGE_ID=${var.NOTION_PAGE_ID}\" >> /root/notion-utils-js/.env",
       "echo \"NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> /root/notion-utils-js/.env",
-      "docker-compose -f /root/notion-utils-js/docker-compose.yml up -d"
+      "docker-compose -f /root/notion-utils-js/docker-compose.yml up -d telegram-bot"
     ]
   }
 
