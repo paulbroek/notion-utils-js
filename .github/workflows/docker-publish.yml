@@ -43,7 +43,8 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 #v2.6.0
         with:
-          cosign-release: "v1.11.0"
+          # cosign-release: "v1.11.0"
+          cosign-release: "v1.13.1"
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -94,6 +95,6 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: |
-          echo "${{ steps.meta.outputs.tags }}"
-          echo "${{ steps.build-and-push.outputs.digest }}"
-        # run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+          # echo "${{ steps.meta.outputs.tags }}"
+          # echo "${{ steps.build-and-push.outputs.digest }}"
+          run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}

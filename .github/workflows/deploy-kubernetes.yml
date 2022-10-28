@@ -14,7 +14,8 @@ on:
 
   workflow_run:
     workflows: ["Docker push"]
-    branches: [main]
+    # branches: [main]
+    branches: [no_branch]
     types:
       - completed
 
@@ -25,7 +26,6 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  if: ${{ false }} # disable for now
   build:
     # name: Build, push, and deploy
     name: pull and deploy
