@@ -5,7 +5,7 @@ Utility library for Notion.so
 Inject contect into Notion pages using javascript.
 Includes a Telegram bot for creating content by interacting with the bot.
 
-## 1.0 Config
+## 0.1 Config
 
 Create `.env` file containing
 
@@ -16,26 +16,21 @@ NOTION_PAGE_ID=...
 NOTION_DATABASE_ID=...
 ```
 
-## 1.1 Install and run
+## 1.0 Install, run and inspect
 
 ```bash
 docker-compose up -d --build
-```
-
-## 1.2 Inspect
-
-```bash
 docker-compose logs -f
 ```
 
-## 1.3 Deploy on Minikube
+## 1.1 Deploy on Minikube
 
 ```bash
 # kubectl create deployment notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js
 kubectl run notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js --image-pull-policy=Never
 ```
 
-## 1.4 Deploy with infrastructure (terraform)
+## 1.2 Deploy infrastructure
 
 ```bash
 cd ~/repos/notion-utils-js/infra
@@ -56,7 +51,7 @@ NOTION_PAGE_ID="..."
 NOTION_DATABASE_ID="..."
 ```
 
-## 1.5 Destroy infrastructure (terraform)
+## 1.3 Destroy infrastructure
 
 ```bash
 cd ~/repos/notion-utils-js/infra
