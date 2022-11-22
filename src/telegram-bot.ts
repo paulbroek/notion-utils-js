@@ -1,7 +1,7 @@
 // TODO: move to seperate repo?
 import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
-import scrapeBook from "./scrape";
+import scrapeBookRetry from "./scrape";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { addSummaryToTable, bookExistsInTable } from ".";
 const bot: Telegraf<Context<Update>> = new Telegraf(
@@ -28,8 +28,8 @@ bot.command("quit", (ctx) => {
 bot.on("text", async (ctx) => {
   //   ctx.reply(`you send me: ${ctx.message.text}`);
   const url = ctx.message.text;
-  const res: null | bookScrapeItem = await scrapeBook(url);
-  ctx.reply(`res: ${JSON.stringify(res)}`);
+  const res: null | bookScrapeItem = await scrapeBookRetry(url);
+  // ctx.reply(`res: ${JSON.stringify(res)}`);
 
   // create notion page, ask user first
   if (res) {

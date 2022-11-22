@@ -1,6 +1,6 @@
+import { bookScrapeItem } from "./../models/bookScrapeItem";
 // from: https://github.com/dmtrbrl/goodreads-web-scraping/blob/master/index.js
 import puppeteer from "puppeteer";
-import { bookScrapeItem } from "../models/bookScrapeItem";
 
 // const extractNumberFromString = (str: string): null | number => {
 //   const matches = str.match(/\d+/);
@@ -9,6 +9,24 @@ import { bookScrapeItem } from "../models/bookScrapeItem";
 //   }
 //   return Number(matches[0]);
 // };
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+const scrapeBookRetry = async (
+  url: string,
+  nRetry = 5
+): Promise<null | bookScrapeItem> => {
+  for (let i = 0; i < nRetry; i++) {
+    console.log("Block statement execution no." + i);
+    const res: null | bookScrapeItem = await scrapeBook(url);
+    if (res != null) {
+      return res;
+    }
+    // retry after delay
+    await delay(1000);
+  }
+  return null;
+};
 
 const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   console.log("Warming up a scrapper");
@@ -28,14 +46,18 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     return null;
   }
 
-  const scrapeItem: null | bookScrapeItem = await page.evaluate(() => {
+  const scrapeItem: null | bookScrapeItem = await page.evaluate(async function (
+    goodreadsUrl: string
+  ) {
     if (!document.querySelector("#coverImage")) {
       console.error("could not locate content of page");
       return null;
     }
-    // const cover = (
-    //   document.querySelector("#coverImage") as HTMLElement
-    // ).getAttribute("src");
+    let coverUrl = "";
+    const cover = (
+      document.querySelector("#coverImage") as HTMLElement
+    ).getAttribute("src");
+    console.log("cover: ", cover);
     const title = (document.querySelector("#bookTitle") as HTMLElement)
       .innerText;
     const author = (document.querySelector(".authorName") as HTMLElement)
@@ -48,11 +70,19 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     // TODO: scrape `published`
     // const published = (document.querySelector("#details") as HTMLElement).innerText;
     console.log("got item");
-    const res: bookScrapeItem = { title, author, isbn, published };
+    const res: bookScrapeItem = {
+      title,
+      author,
+      isbn,
+      published,
+      coverUrl,
+      goodreadsUrl,
+    };
     return res;
-  });
+  },
+  url);
 
   return scrapeItem;
 };
 
-export default scrapeBook;
+export default scrapeBookRetry;

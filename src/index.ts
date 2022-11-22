@@ -24,14 +24,14 @@ const getPage = async (pageId: string) => {
 // Can only fetch pages by parent page
 // const getPages = async (): Promise<null> => {};
 
-const getPageProperties = async (pageId: string, propertyId: string) => {
-  const response = await notion.pages.properties.retrieve({
-    page_id: pageId,
-    property_id: propertyId,
-  });
-  console.log("response: ", response);
-  return response;
-};
+// const getPageProperties = async (pageId: string, propertyId: string) => {
+//   const response = await notion.pages.properties.retrieve({
+//     page_id: pageId,
+//     property_id: propertyId,
+//   });
+//   console.log("response: ", response);
+//   return response;
+// };
 // (async () => getPageProperties(pageId))();
 
 const bookExistsInTable = async (item: bookScrapeItem): Promise<Boolean> => {
@@ -39,8 +39,8 @@ const bookExistsInTable = async (item: bookScrapeItem): Promise<Boolean> => {
     database_id: databaseId,
     filter: {
       and: [
-        { property: "Author", title: { equals: item.author } },
-        { property: "Title", rich_text: { equals: item.title } },
+        { property: "Author", rich_text: { equals: item.author } },
+        { property: "Title", title: { equals: item.title } },
       ],
     },
   });
@@ -60,17 +60,26 @@ const addSummaryToTable = async (
         url: "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
       },
     },
-    icon: {
-      type: "emoji",
-      emoji: "🥬",
-    },
+    // icon: {
+    //   type: "emoji",
+    //   emoji: "🥬",
+    // },
     parent: {
       type: "database_id",
       database_id: databaseId,
     },
     properties: {
-      Author: {
+      Title: {
         title: [
+          {
+            text: {
+              content: item.title,
+            },
+          },
+        ],
+      },
+      Author: {
+        rich_text: [
           {
             text: {
               content: item.author,
@@ -78,14 +87,8 @@ const addSummaryToTable = async (
           },
         ],
       },
-      Title: {
-        rich_text: [
-          {
-            text: {
-              content: item.title,
-            },
-          },
-        ],
+      Goodreads: {
+        url: item.goodreadsUrl,
       },
       // isbn: {
       //   rich_text: [
