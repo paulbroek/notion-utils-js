@@ -53,6 +53,7 @@ const addSummaryToTable = async (
 ): Promise<CreatePageResponse> => {
   // TODO: check if book exists in table
   // Use title + author
+  console.error("item.authorUrl: ", JSON.stringify(item.authorUrl));
   const response: CreatePageResponse = await notion.pages.create({
     cover: {
       type: "external",
@@ -81,8 +82,14 @@ const addSummaryToTable = async (
       Author: {
         rich_text: [
           {
+            type: "text",
             text: {
               content: item.author,
+              link: {
+                // TODO: inject author URL
+                // url: item.authorUrl,
+                url: "http://www.nu.nl",
+              },
             },
           },
         ],

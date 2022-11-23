@@ -34,6 +34,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    dumpio: true,
   });
   const page = await browser.newPage();
 
@@ -46,6 +47,12 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     return null;
   }
 
+  // console.log statements inside page.evaluate callback run in puppeteer browser, so they will not be displayed here, unless:
+  // page.on("console", (msg) => {
+  //   for (let i = 0; i < msg.args.length; ++i)
+  //     console.log(`${i}: ${msg.args[i]}`);
+  // });
+
   const scrapeItem: null | bookScrapeItem = await page.evaluate(async function (
     goodreadsUrl: string
   ) {
@@ -53,15 +60,22 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       console.error("could not locate content of page");
       return null;
     }
-    let coverUrl = "";
-    const cover = (
-      document.querySelector("#coverImage") as HTMLElement
-    ).getAttribute("src");
-    console.log("cover: ", cover);
+    const coverUrl =
+      (document.querySelector("#coverImage") as HTMLElement).getAttribute(
+        "src"
+      ) + "";
     const title = (document.querySelector("#bookTitle") as HTMLElement)
       .innerText;
+    // TODO: deal with multiple author case, scrape ContributorLinksList first
     const author = (document.querySelector(".authorName") as HTMLElement)
       .innerText;
+    // const authorUrl = document.querySelector(
+    //   ".ContributorLinksList"
+    // ) as HTMLElement;
+    const authorUrl = (document.querySelector(".authorUrl") as HTMLElement)
+      .innerText;
+    // const authorUrl = "nothing";
+    // .getAttribute("href");
     const isbnElement = document.querySelector(
       "#bookDataBox > div.clearFloats > div.infoBoxRowItem"
     ) as HTMLElement;
@@ -69,7 +83,6 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     const published = "";
     // TODO: scrape `published`
     // const published = (document.querySelector("#details") as HTMLElement).innerText;
-    console.log("got item");
     const res: bookScrapeItem = {
       title,
       author,
@@ -77,6 +90,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       published,
       coverUrl,
       goodreadsUrl,
+      authorUrl,
     };
     return res;
   },

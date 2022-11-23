@@ -5,4 +5,5 @@ export interface bookScrapeItem {
   published: string;
   coverUrl?: string;
   goodreadsUrl: string;
+  authorUrl: any;
 }
