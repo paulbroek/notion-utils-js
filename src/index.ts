@@ -56,8 +56,10 @@ const addSummaryToTable = async (
     cover: {
       type: "external",
       external: {
-        // url: item.coverUrl,
-        url: "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
+        url:
+          item.coverUrl ||
+          "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
+        // url: "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
       },
     },
     // icon: {

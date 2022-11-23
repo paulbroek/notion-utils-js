@@ -3,7 +3,7 @@ export interface bookScrapeItem {
   title: string;
   isbn?: string;
   published: string;
-  coverUrl: string;
+  coverUrl?: string;
   goodreadsUrl: string;
   authorUrl: any;
 }

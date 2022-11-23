@@ -12,9 +12,6 @@ const fs = require("fs");
 //   return Number(matches[0]);
 // };
 
-const defaultCoverImage =
-  "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg";
-
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const scrapeBookRetry = async (
@@ -25,6 +22,17 @@ const scrapeBookRetry = async (
     console.log("Block statement execution no." + i);
     const res: null | bookScrapeItem = await scrapeBook(url);
     if (res != null) {
+      // dump to json file?
+      fs.writeFile(
+        "/tmp/scrapeItem.json",
+        JSON.stringify(res),
+        "utf8",
+        function (err) {
+          if (err) throw err;
+          console.log("complete");
+        }
+      );
+
       return res;
     }
     // retry after delay
@@ -65,9 +73,11 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     //   console.error("could not locate content of page");
     //   return null;
     // }
-    // const coverUrl: string | null = (
-    //   document.querySelector("#coverImage") as HTMLElement
-    // ).getAttribute("src");
+    const coverUrl: string | null = (
+      document.querySelector("#coverImage") as HTMLElement
+    ).getAttribute("src");
+    const defaultCoverUrl =
+      "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg";
     const title = (document.querySelector("#bookTitle") as HTMLElement)
       .innerText;
     // TODO: deal with multiple author case, scrape ContributorLinksList first
@@ -92,22 +102,11 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       author,
       isbn,
       published,
-      // coverUrl: coverUrl === null ? defaultCoverImage : coverUrl,
-      coverUrl: defaultCoverImage,
+      coverUrl: coverUrl === null ? defaultCoverUrl : coverUrl,
+      // coverUrl,
       goodreadsUrl,
       authorUrl,
     };
-
-    // dump to json file?
-    fs.writeFile(
-      "scrapeItem.json",
-      JSON.stringify(res),
-      "utf8",
-      function (err) {
-        if (err) throw err;
-        console.log("complete");
-      }
-    );
 
     return res;
   },

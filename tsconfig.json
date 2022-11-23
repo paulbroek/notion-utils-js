@@ -10,7 +10,7 @@
     "checkJs": true,
     "allowJs": true,
     "moduleResolution": "node",
-    "types": ["node"],
+    "types": ["node", "@types/jest"],
     "lib": ["es6"],
     "esModuleInterop": true,
     "skipLibCheck": true,
