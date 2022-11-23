@@ -6,7 +6,6 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const pageId = process.env.NOTION_PAGE_ID as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
 console.log("pageId: ", pageId);
-
 // dummy method to verify if any data can be pulled from Notion API
 
 const getPage = async (pageId: string) => {
@@ -44,7 +43,6 @@ const bookExistsInTable = async (item: bookScrapeItem): Promise<Boolean> => {
       ],
     },
   });
-  // console.log("response: ", JSON.stringify(response));
   return response.results.length ? true : false;
 };
 
@@ -58,6 +56,7 @@ const addSummaryToTable = async (
     cover: {
       type: "external",
       external: {
+        // url: item.coverUrl,
         url: "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
       },
     },
@@ -96,6 +95,7 @@ const addSummaryToTable = async (
       },
       Goodreads: {
         url: item.goodreadsUrl,
+        // url: "" + item.coverUrl,
       },
       // isbn: {
       //   rich_text: [

@@ -1,6 +1,8 @@
 import { bookScrapeItem } from "./../models/bookScrapeItem";
 // from: https://github.com/dmtrbrl/goodreads-web-scraping/blob/master/index.js
 import puppeteer from "puppeteer";
+// import fs from "fs";
+const fs = require("fs");
 
 // const extractNumberFromString = (str: string): null | number => {
 //   const matches = str.match(/\d+/);
@@ -9,6 +11,9 @@ import puppeteer from "puppeteer";
 //   }
 //   return Number(matches[0]);
 // };
+
+const defaultCoverImage =
+  "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg";
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -34,7 +39,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    dumpio: true,
+    // dumpio: true,
   });
   const page = await browser.newPage();
 
@@ -56,14 +61,13 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   const scrapeItem: null | bookScrapeItem = await page.evaluate(async function (
     goodreadsUrl: string
   ) {
-    if (!document.querySelector("#coverImage")) {
-      console.error("could not locate content of page");
-      return null;
-    }
-    const coverUrl =
-      (document.querySelector("#coverImage") as HTMLElement).getAttribute(
-        "src"
-      ) + "";
+    // if (!document.querySelector("#coverImage")) {
+    //   console.error("could not locate content of page");
+    //   return null;
+    // }
+    // const coverUrl: string | null = (
+    //   document.querySelector("#coverImage") as HTMLElement
+    // ).getAttribute("src");
     const title = (document.querySelector("#bookTitle") as HTMLElement)
       .innerText;
     // TODO: deal with multiple author case, scrape ContributorLinksList first
@@ -72,9 +76,9 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     // const authorUrl = document.querySelector(
     //   ".ContributorLinksList"
     // ) as HTMLElement;
-    const authorUrl = (document.querySelector(".authorUrl") as HTMLElement)
-      .innerText;
-    // const authorUrl = "nothing";
+    // const authorUrl = (document.querySelector(".authorUrl") as HTMLElement)
+    //   .innerText;
+    const authorUrl = "nothing";
     // .getAttribute("href");
     const isbnElement = document.querySelector(
       "#bookDataBox > div.clearFloats > div.infoBoxRowItem"
@@ -88,10 +92,23 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       author,
       isbn,
       published,
-      coverUrl,
+      // coverUrl: coverUrl === null ? defaultCoverImage : coverUrl,
+      coverUrl: defaultCoverImage,
       goodreadsUrl,
       authorUrl,
     };
+
+    // dump to json file?
+    fs.writeFile(
+      "scrapeItem.json",
+      JSON.stringify(res),
+      "utf8",
+      function (err) {
+        if (err) throw err;
+        console.log("complete");
+      }
+    );
+
     return res;
   },
   url);
