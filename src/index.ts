@@ -40,8 +40,8 @@ const deletePage = async (pageId: string) => {
   console.log("page deleted");
 };
 
-const deleteLastSummary = async () => {
-  // 1. get summaries sorted by created_date
+const deleteLastSummary = async (): Promise<string | undefined> => {
+  // 1. get summaries sorted by `Created time`
   const response = await notion.databases.query({
     database_id: databaseId,
     sorts: [
@@ -53,15 +53,32 @@ const deleteLastSummary = async () => {
     page_size: 1,
   });
 
-  console.log("res len: " + response.results.length);
-  const lastSummaryId = response.results[0].id;
-  console.log("last summary id: " + lastSummaryId);
-  // console.log("last summary: " + response.results[0].url);
-  // console.log(JSON.stringify(response.results[0]));
-  // console.log(response.results[0]);
+  // console.log("res len: " + response.results.length);
+  if (response.results.length == 0) {
+    console.error("no results in table");
+    return;
+  }
+  const lastSummaryPage = response.results[0];
+  const lastSummaryId = lastSummaryPage.id;
+  const lastSummaryUrl = lastSummaryPage["url"];
+  console.log("lastSummaryId: " + lastSummaryId);
+  console.log("lastSummaryUrl: " + lastSummaryUrl);
+  console.log(lastSummaryPage);
 
   // 2. delete summary
-  await deletePage(lastSummaryId);
+  // 2.1 only allow to delete when page text is empty
+  // retrieving page content is not easy, so use the difference between created_time and last_edited_time to determine if it has been manually edited
+  if (lastSummaryPage["created_time"] != lastSummaryPage["last_edited_time"]) {
+    return "cannot delete, since page was manually edited";
+  }
+
+  try {
+    await deletePage(lastSummaryId);
+    // return lastSummaryId;
+    return lastSummaryUrl;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const bookExistsInTable = async (url: string): Promise<Boolean> => {
