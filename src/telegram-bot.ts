@@ -26,9 +26,13 @@ bot.command("quit", (ctx) => {
   ctx.leaveChat();
 });
 
-bot.on("text", async (ctx) => {
-  //   ctx.reply(`you send me: ${ctx.message.text}`);
-  const url = ctx.message.text;
+const scrapeAndReply = async (ctx, msg: string) => {
+  // TODO: check if msg is valid URL or ask user
+  if (!msg.startsWith("https://www.goodreads.com/book/show/")) {
+    ctx.reply("please pass valid goodreads book URL");
+    return;
+  }
+  const url = msg;
   const res: null | bookScrapeItem = await scrapeBookRetry(url);
   // ctx.reply(`res: ${JSON.stringify(res)}`);
 
@@ -61,6 +65,21 @@ bot.on("text", async (ctx) => {
   } else {
     ctx.reply("could not scrape goodreads page");
   }
+};
+
+// both plain messages and /add commands will add summaries to Notion
+bot.command("add", async (ctx) => {
+  const msgs = ctx.update.message.text.split(" ");
+  console.log("msgs: ", JSON.stringify(msgs));
+  if (msgs.length == 1) {
+    ctx.reply("please pass an URL argument");
+    return;
+  }
+  const msg = msgs[1];
+  await scrapeAndReply(ctx, msg);
+});
+bot.on("text", async (ctx) => {
+  await scrapeAndReply(ctx, ctx.message.text);
 });
 
 // TODO: ask user to optionally add reminders, they will be set in Notion

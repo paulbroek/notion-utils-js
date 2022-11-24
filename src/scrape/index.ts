@@ -69,10 +69,11 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   const scrapeItem: null | bookScrapeItem = await page.evaluate(async function (
     goodreadsUrl: string
   ) {
-    // if (!document.querySelector("#coverImage")) {
-    //   console.error("could not locate content of page");
-    //   return null;
-    // }
+    // wait for element to be ready
+    if (!document.querySelector("#coverImage")) {
+      console.error("could not locate content of page");
+      return null;
+    }
     const coverUrl: string | null = (
       document.querySelector("#coverImage") as HTMLElement
     ).getAttribute("src");
