@@ -3,7 +3,7 @@ import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-import { addSummaryToTable, bookExistsInTable } from ".";
+import { addSummaryToTable, bookExistsInTable, deleteLastSummary } from ".";
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
@@ -26,32 +26,38 @@ bot.command("quit", (ctx) => {
   ctx.leaveChat();
 });
 
-const scrapeAndReply = async (ctx, msg: string) => {
-  // TODO: check if msg is valid URL or ask user
+const scrapeAndReply = async (ctx: Context, msg: string) => {
+  // check if msg is valid URL or ask user
   if (!msg.startsWith("https://www.goodreads.com/book/show/")) {
     ctx.reply("please pass valid goodreads book URL");
     return;
   }
-  const url = msg;
+  const url: string = msg;
+
+  // check if book exists
+  const bookExists: Boolean = await bookExistsInTable(url);
+  if (bookExists) {
+    console.log("book exists");
+    ctx.reply("Book already exists in summary database");
+    return;
+  }
+
+  // user feedback, send message when starting scrape process, delete it when finished / error
+  const { message_id } = await ctx.reply("scraping..");
+  // console.log("message_id: ", message_id);
+
   const res: null | bookScrapeItem = await scrapeBookRetry(url);
   // ctx.reply(`res: ${JSON.stringify(res)}`);
+  await ctx.deleteMessage(message_id);
 
   // create notion page, ask user first
   if (res) {
-    // check if book exists
-    const bookExists: Boolean = await bookExistsInTable(res);
-    if (bookExists) {
-      console.log("book exists");
-      ctx.reply("Book already exists in summary database");
-      return;
-    }
-
-    ctx.reply("creating record in Notion table..");
-
+    // const { message_id } = await ctx.reply("creating record in Notion table..");
     const addResult = await addSummaryToTable(res);
+    // await ctx.deleteMessage(message_id);
 
     if (!addResult) {
-      console.log("could not add result to Notion");
+      ctx.reply("could not add result to Notion");
       // TODO: retry automatically?
     } else {
       // console.log("addResult: ", JSON.stringify(addResult));
@@ -60,17 +66,22 @@ const scrapeAndReply = async (ctx, msg: string) => {
 
       const recreatedObject = JSON.parse(JSON.stringify(addResult));
       console.log("addResult.reparsed: ", recreatedObject.url);
-      ctx.reply(`visit the summary at: ${recreatedObject.url}`);
+      ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
     }
   } else {
-    ctx.reply("could not scrape goodreads page");
+    ctx.reply("Could not scrape Goodreads page");
   }
 };
+
+bot.command("delete_last", async (ctx) => {
+  // delete last added book summary, but only when text is empty (safety check)
+  await deleteLastSummary();
+});
 
 // both plain messages and /add commands will add summaries to Notion
 bot.command("add", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
-  console.log("msgs: ", JSON.stringify(msgs));
+  // console.log("msgs: ", JSON.stringify(msgs));
   if (msgs.length == 1) {
     ctx.reply("please pass an URL argument");
     return;
@@ -78,6 +89,7 @@ bot.command("add", async (ctx) => {
   const msg = msgs[1];
   await scrapeAndReply(ctx, msg);
 });
+
 bot.on("text", async (ctx) => {
   await scrapeAndReply(ctx, ctx.message.text);
 });

@@ -33,14 +33,40 @@ const getPage = async (pageId: string) => {
 // };
 // (async () => getPageProperties(pageId))();
 
-const bookExistsInTable = async (item: bookScrapeItem): Promise<Boolean> => {
+const deletePage = async (pageId: string) => {
+  // beset practice is to not actually delete, but set `archived` to true.
+  // also safer for exposing Notion through Telegram, if anyone would get access to your bot.
+  await notion.pages.update({ page_id: pageId, archived: true });
+};
+
+const deleteLastSummary = async () => {
+  // get summaries sorted by created_date
+  const response = await notion.databases.query({
+    database_id: databaseId,
+    sorts: [
+      {
+        property: "Created time",
+        direction: "descending",
+      },
+    ],
+    // filter: {
+    //   and: [{ property: "Goodreads URL", url: { equals: url } }],
+    // },
+  });
+
+  console.log("res len: " + response.results.length);
+  // console.log(JSON.stringify(response));
+
+  // const pageId = ...
+  // delete summary
+  // await deletePage(pageId)
+};
+
+const bookExistsInTable = async (url: string): Promise<Boolean> => {
   const response = await notion.databases.query({
     database_id: databaseId,
     filter: {
-      and: [
-        { property: "Author", rich_text: { equals: item.author } },
-        { property: "Title", title: { equals: item.title } },
-      ],
+      and: [{ property: "Goodreads URL", url: { equals: url } }],
     },
   });
   return response.results.length ? true : false;
@@ -95,7 +121,7 @@ const addSummaryToTable = async (
           },
         ],
       },
-      Goodreads: {
+      "Goodreads URL": {
         url: item.goodreadsUrl,
         // url: "" + item.coverUrl,
       },
@@ -148,4 +174,4 @@ const addSummaryToTable = async (
   return response;
 };
 
-export { addSummaryToTable, bookExistsInTable };
+export { addSummaryToTable, bookExistsInTable, deleteLastSummary };
