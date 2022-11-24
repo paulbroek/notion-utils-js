@@ -2,8 +2,9 @@ import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 import input from "input";
 
-const apiId = parseInt(process.env.TELEGRAM_API_ID || "") as number;
-const apiHash = process.env.TELEGRAM_API_HASH as string;
+const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
+const apiHash: string = process.env.TELEGRAM_API_HASH as string;
+const chatId: number = parseInt(process.env.TELEGRAM_CHAT_ID || "") as number;
 const stringSession = new StringSession(""); // fill this later with the value from session.save()
 
 test("connect to Telegram", async () => {
@@ -25,7 +26,8 @@ test("connect to Telegram", async () => {
 
   console.log("You should now be connected.");
   console.log(client.session.save()); // Save this string to avoid logging in again
-  await client.sendMessage("me", { message: "Hello!" });
+  // await client.sendMessage("me", { message: "Hello!" });
+  await client.sendMessage(chatId, { message: "Hello!" });
   // afterAll(async () => {
   //   await client.destroy();
   // });
