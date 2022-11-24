@@ -60,9 +60,12 @@ const deleteLastSummary = async (): Promise<string | undefined> => {
   }
   const lastSummaryPage = response.results[0];
   const lastSummaryId = lastSummaryPage.id;
-  const lastSummaryUrl = lastSummaryPage["url"];
+  // const lastSummaryUrl = lastSummaryPage["url"];
+  const lastSummaryTitle =
+    lastSummaryPage["properties"]["Title"].title[0].text.content;
   console.log("lastSummaryId: " + lastSummaryId);
-  console.log("lastSummaryUrl: " + lastSummaryUrl);
+  // console.log("lastSummaryUrl: " + lastSummaryUrl);
+  console.log("lastSummaryTitle: " + lastSummaryTitle);
   console.log(lastSummaryPage);
 
   // 2. delete summary
@@ -75,9 +78,25 @@ const deleteLastSummary = async (): Promise<string | undefined> => {
   try {
     await deletePage(lastSummaryId);
     // return lastSummaryId;
-    return lastSummaryUrl;
+    return lastSummaryTitle;
   } catch (error) {
     console.error(error);
+  }
+};
+
+const periodicallyDoTillSuccess = async (
+  every: number = 3000,
+  async_callback: Function,
+  params
+) => {
+  // const interval = setInterval(async () => {
+  //   await async_callback(params);
+  // }, every);
+  while (true) {
+    const res = await async_callback(params);
+    if (res) {
+      break;
+    }
   }
 };
 
@@ -193,4 +212,9 @@ const addSummaryToTable = async (
   return response;
 };
 
-export { addSummaryToTable, bookExistsInTable, deleteLastSummary };
+export {
+  addSummaryToTable,
+  bookExistsInTable,
+  deleteLastSummary,
+  periodicallyDoTillSuccess,
+};

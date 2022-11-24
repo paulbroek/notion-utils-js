@@ -76,7 +76,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
 bot.command("delete_last", async (ctx) => {
   // delete last added book summary, but only when text is empty (safety check)
   const pageId = await deleteLastSummary();
-  ctx.reply("deleted page: " + pageId);
+  ctx.reply("deleted page: \n" + pageId);
 });
 
 // both plain messages and /add commands will add summaries to Notion
