@@ -2,6 +2,6 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  testTimeout: 20000,
+  testTimeout: 30000,
   setupFiles: ["./__tests__/setup-tests.ts"],
 };

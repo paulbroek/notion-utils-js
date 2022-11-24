@@ -45,8 +45,6 @@ test("connect to Telegram and send message", async () => {
   await client.sendMessage(chatId, { message: "@bookSummariesBot hoi" });
 });
 
-// TODO: use inner tests for longer tests, see:
-// https://stackoverflow.com/questions/51269431/jest-mock-inner-function
 describe("Integration test: connect to Telegram, set databaseId, add Summary, and delete it", () => {
   let client: TelegramClient;
   beforeAll(async () => {
@@ -58,6 +56,7 @@ describe("Integration test: connect to Telegram, set databaseId, add Summary, an
       message: `/set_database_id ${databaseId}`,
     });
     // TODO: check if bot replied with this databaseId
+    // expect(lastMessage.split(" ")[-1]).toEqual(databaseId)
   });
 
   // Summary should not exist in table yet, or create a new database yourself
@@ -93,9 +92,13 @@ describe("Integration test: connect to Telegram, set databaseId, add Summary, an
   });
 
   // TODO: add afterAll to close client connection
-  // should be able to run without --force-exit flag
+  afterAll(async () => {
+    await client.disconnect();
+    await client.destroy();
+  });
+  // TODO: should be able to run without --force-exit flag
   // option: set databaseId back to what is was before testing.
-  // option: create chatGroup programatically and add the bot
+  // option: create chatGroup progratically and add the bot
 });
 
 // describe("Add a book summary twice, should fail second time", async () => {
