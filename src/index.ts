@@ -5,7 +5,7 @@ import { WatchDirectoryFlags } from "typescript";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 const pageId = process.env.NOTION_PAGE_ID as string;
-const databaseId = process.env.NOTION_DATABASE_ID as string;
+// const databaseId = process.env.NOTION_DATABASE_ID as string;
 console.log("pageId: ", pageId);
 // dummy method to verify if any data can be pulled from Notion API
 
@@ -41,7 +41,9 @@ const deletePage = async (pageId: string) => {
   console.log("page deleted");
 };
 
-const deleteLastSummary = async (): Promise<string | undefined> => {
+const deleteLastSummary = async (
+  databaseId: string
+): Promise<string | undefined> => {
   // 1. get summaries sorted by `Created time`
   const response = await notion.databases.query({
     database_id: databaseId,
@@ -85,18 +87,37 @@ const deleteLastSummary = async (): Promise<string | undefined> => {
   }
 };
 
-const bookExistsInTable = async (url: string): Promise<Boolean> => {
+const databaseExistsForUser = async (databaseId: string): Promise<boolean> => {
+  // TODO: check if database exists for specific User, so reconnect to Notion
+  try {
+    const response = await notion.databases.query({
+      database_id: databaseId,
+      page_size: 1,
+    });
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+  return true;
+};
+
+interface Props {
+  goodreadsUrl: string;
+  databaseId: string;
+}
+const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   const response = await notion.databases.query({
-    database_id: databaseId,
+    database_id: props.databaseId,
     filter: {
-      and: [{ property: "Goodreads URL", url: { equals: url } }],
+      and: [{ property: "Goodreads URL", url: { equals: props.goodreadsUrl } }],
     },
   });
   return response.results.length ? true : false;
 };
 
 const addSummaryToTable = async (
-  item: bookScrapeItem
+  item: bookScrapeItem,
+  databaseId: string
 ): Promise<CreatePageResponse> => {
   // TODO: check if book exists in table
   // Use title + author
@@ -197,4 +218,9 @@ const addSummaryToTable = async (
   return response;
 };
 
-export { addSummaryToTable, bookExistsInTable, deleteLastSummary };
+export {
+  addSummaryToTable,
+  bookExistsInTable,
+  deleteLastSummary,
+  databaseExistsForUser,
+};

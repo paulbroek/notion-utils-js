@@ -1,18 +1,36 @@
-// TODO: move to seperate repo?
 import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-import { addSummaryToTable, bookExistsInTable, deleteLastSummary } from ".";
+import {
+  addSummaryToTable,
+  bookExistsInTable,
+  databaseExistsForUser,
+  deleteLastSummary,
+} from ".";
+// const databaseId = process.env.NOTION_DATABASE_ID as string;
+let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
+
+const didSetDatabaseId = (ctx: Context): boolean => {
+  // TODO: turn into decorator that checks this
+  if (!databaseId) {
+    ctx.reply(
+      "please set a databaseId first using\n /set_database_id YOUR_DATABASE_ID"
+    );
+    return false;
+  }
+  return true;
+};
 
 bot.start((ctx) => {
   ctx.reply("Hello " + ctx.from.first_name + "!");
 });
 
 bot.help((ctx) => {
+  // TODO: send list of all commands
   ctx.reply("Send /start to receive a greeting");
   ctx.reply("Send /keyboard to receive a message with a keyboard");
   ctx.reply("Send /quit to stop the bot");
@@ -27,15 +45,24 @@ bot.command("quit", (ctx) => {
 });
 
 const scrapeAndReply = async (ctx: Context, msg: string) => {
+  // check if databaseId is set
+  const didSet: boolean = didSetDatabaseId(ctx);
+  if (!didSet) {
+    return;
+  }
+
   // check if msg is valid URL or ask user
   if (!msg.startsWith("https://www.goodreads.com/book/show/")) {
     ctx.reply("please pass valid goodreads book URL");
     return;
   }
-  const url: string = msg;
+  const goodreadsUrl: string = msg;
 
   // check if book exists
-  const bookExists: Boolean = await bookExistsInTable(url);
+  const bookExists: Boolean = await bookExistsInTable({
+    goodreadsUrl,
+    databaseId,
+  });
   if (bookExists) {
     // console.log("book exists");
     ctx.reply("Book already exists in summary database");
@@ -46,7 +73,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   const { message_id } = await ctx.reply("scraping..");
   // console.log("message_id: ", message_id);
 
-  const res: null | bookScrapeItem = await scrapeBookRetry(url);
+  const res: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
   // const res: null | bookScrapeItem = null;
   // ctx.reply(`res: ${JSON.stringify(res)}`);
   await ctx.deleteMessage(message_id);
@@ -54,7 +81,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   // create notion page, ask user first
   if (res) {
     // const { message_id } = await ctx.reply("creating record in Notion table..");
-    const addResult = await addSummaryToTable(res);
+    const addResult = await addSummaryToTable(res, databaseId);
     // await ctx.deleteMessage(message_id);
 
     if (!addResult) {
@@ -74,9 +101,37 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   }
 };
 
+bot.command("get_current_database_id", async (ctx) => {
+  ctx.reply("current databaseId: \n" + databaseId);
+});
+
+bot.command("set_database_id", async (ctx) => {
+  const msgs = ctx.update.message.text.split(" ");
+  // console.log("msgs: ", JSON.stringify(msgs));
+  if (msgs.length == 1) {
+    ctx.reply("please pass one databaseId");
+    return;
+  }
+  databaseId = msgs[1];
+  // TODO: how to save this state when restarting bot?
+  // check if database exists for user
+  const databaseExists: boolean = await databaseExistsForUser(databaseId);
+  if (!databaseExists) {
+    ctx.reply("databaseId does not exist for user");
+    return;
+  }
+
+  ctx.reply("databaseId was set to: \n" + databaseId);
+});
+
 bot.command("delete_last", async (ctx) => {
+  const didSet: boolean = didSetDatabaseId(ctx);
+  if (!didSet) {
+    return;
+  }
+
   // delete last added book summary, but only when text is empty (safety check)
-  const pageId = await deleteLastSummary();
+  const pageId = await deleteLastSummary(databaseId);
   ctx.reply("deleted page: \n" + pageId);
 });
 

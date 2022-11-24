@@ -3,7 +3,7 @@ const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 const periodicallyDoTillCondition = async (
   every: number = 3000,
   async_callback: Function,
-  callback_params: any,
+  callback_params: object,
   condition: boolean = true
 ) => {
   while (true) {
