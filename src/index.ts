@@ -37,10 +37,11 @@ const deletePage = async (pageId: string) => {
   // beset practice is to not actually delete, but set `archived` to true.
   // also safer for exposing Notion through Telegram, if anyone would get access to your bot.
   await notion.pages.update({ page_id: pageId, archived: true });
+  console.log("page deleted");
 };
 
 const deleteLastSummary = async () => {
-  // get summaries sorted by created_date
+  // 1. get summaries sorted by created_date
   const response = await notion.databases.query({
     database_id: databaseId,
     sorts: [
@@ -49,17 +50,18 @@ const deleteLastSummary = async () => {
         direction: "descending",
       },
     ],
-    // filter: {
-    //   and: [{ property: "Goodreads URL", url: { equals: url } }],
-    // },
+    page_size: 1,
   });
 
   console.log("res len: " + response.results.length);
-  // console.log(JSON.stringify(response));
+  const lastSummaryId = response.results[0].id;
+  console.log("last summary id: " + lastSummaryId);
+  // console.log("last summary: " + response.results[0].url);
+  // console.log(JSON.stringify(response.results[0]));
+  // console.log(response.results[0]);
 
-  // const pageId = ...
-  // delete summary
-  // await deletePage(pageId)
+  // 2. delete summary
+  await deletePage(lastSummaryId);
 };
 
 const bookExistsInTable = async (url: string): Promise<Boolean> => {
