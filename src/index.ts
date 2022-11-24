@@ -1,7 +1,7 @@
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
-import { WatchDirectoryFlags } from "typescript";
+// import { WatchDirectoryFlags } from "typescript";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 const pageId = process.env.NOTION_PAGE_ID as string;
