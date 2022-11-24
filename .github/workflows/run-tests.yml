@@ -18,10 +18,11 @@ on:
     # branches: ["no_branch"]
 
 env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+  TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+  TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+  TELEGRAM_SESSION_KEY: ${{ secrets.TELEGRAM_SESSION_KEY }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
 jobs:
   build:
@@ -37,6 +38,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
       - run: yarn install
       # - run: yarn test
       - run: yarn jest __tests__/telegram.ts --forceExit
