@@ -1,7 +1,8 @@
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 import input from "input";
-import { bookExistsInTable, periodicallyDoTillSuccess } from "../src/";
+import { bookExistsInTable } from "../src/";
+import { periodicallyDoTillCondition } from "../src/utils";
 
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
 const apiHash: string = process.env.TELEGRAM_API_HASH as string;
@@ -43,14 +44,20 @@ test("connect to Telegram and send message", async () => {
   await client.sendMessage(chatId, { message: "@bookSummariesBot hoi" });
 });
 
-test("connect to Telegram and add Summary", async () => {
+test("connect to Telegram, add Summary, and delete it", async () => {
   const client = await connectTelegramClient();
   await client.sendMessage(chatId, { message: `/add ${BOOK_URL}` });
-  // TODO: check if page exists in Notion database
+  // check if page exists in Notion database
   // TODO: and bot should not have returned error msg
-  await periodicallyDoTillSuccess(2000, bookExistsInTable, BOOK_URL);
+  await periodicallyDoTillCondition(1000, bookExistsInTable, BOOK_URL, true);
+
+  await client.sendMessage(chatId, { message: "/delete_last" });
+  // now wait for it to disappear
+  await periodicallyDoTillCondition(1000, bookExistsInTable, BOOK_URL, false);
 });
 
+// TODO: runs after previous test?
+// or include both functionalities in above test
 // test("connect to Telegram and delete last Summary", async () => {
 //   const client = await connectTelegramClient();
 //   await client.sendMessage(chatId, { message: "/delete_last" });

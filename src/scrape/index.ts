@@ -1,6 +1,7 @@
 import { bookScrapeItem } from "./../models/bookScrapeItem";
 // from: https://github.com/dmtrbrl/goodreads-web-scraping/blob/master/index.js
 import puppeteer from "puppeteer";
+import { delay } from "../utils";
 // import fs from "fs";
 const fs = require("fs");
 
@@ -11,8 +12,6 @@ const fs = require("fs");
 //   }
 //   return Number(matches[0]);
 // };
-
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const scrapeBookRetry = async (
   url: string,

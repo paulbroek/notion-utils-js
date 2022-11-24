@@ -37,7 +37,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   // check if book exists
   const bookExists: Boolean = await bookExistsInTable(url);
   if (bookExists) {
-    console.log("book exists");
+    // console.log("book exists");
     ctx.reply("Book already exists in summary database");
     return;
   }
@@ -47,6 +47,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   // console.log("message_id: ", message_id);
 
   const res: null | bookScrapeItem = await scrapeBookRetry(url);
+  // const res: null | bookScrapeItem = null;
   // ctx.reply(`res: ${JSON.stringify(res)}`);
   await ctx.deleteMessage(message_id);
 

@@ -1,6 +1,7 @@
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
+import { WatchDirectoryFlags } from "typescript";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 const pageId = process.env.NOTION_PAGE_ID as string;
@@ -81,22 +82,6 @@ const deleteLastSummary = async (): Promise<string | undefined> => {
     return lastSummaryTitle;
   } catch (error) {
     console.error(error);
-  }
-};
-
-const periodicallyDoTillSuccess = async (
-  every: number = 3000,
-  async_callback: Function,
-  params
-) => {
-  // const interval = setInterval(async () => {
-  //   await async_callback(params);
-  // }, every);
-  while (true) {
-    const res = await async_callback(params);
-    if (res) {
-      break;
-    }
   }
 };
 
@@ -212,9 +197,4 @@ const addSummaryToTable = async (
   return response;
 };
 
-export {
-  addSummaryToTable,
-  bookExistsInTable,
-  deleteLastSummary,
-  periodicallyDoTillSuccess,
-};
+export { addSummaryToTable, bookExistsInTable, deleteLastSummary };
