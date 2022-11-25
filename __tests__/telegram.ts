@@ -3,6 +3,7 @@ import { StringSession } from "telegram/sessions";
 import input from "input";
 import { bookExistsInTable } from "../src/";
 import { periodicallyDoTillCondition } from "../src/utils";
+import { createTextChangeRange } from "typescript";
 
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
 const apiHash: string = process.env.TELEGRAM_API_HASH as string;
@@ -42,7 +43,12 @@ const connectTelegramClient = async () => {
 // TODO: turn connectTelegramClient into fixture?
 test("connect to Telegram and send message", async () => {
   const client = await connectTelegramClient();
-  await client.sendMessage(chatId, { message: "@bookSummariesBot hoi" });
+  const testMessage: string = "@bookSummariesBot hoi";
+  await client.sendMessage(chatId, { message: testMessage });
+  // test if last message is indeed send
+  const msgs = await client.getMessages(chatId, { limit: 1 });
+  const lastMessage: string = msgs[0].message;
+  expect(testMessage).toEqual(lastMessage);
 });
 
 describe("Integration test: connect to Telegram, set databaseId, add Summary, and delete it", () => {
@@ -55,8 +61,13 @@ describe("Integration test: connect to Telegram, set databaseId, add Summary, an
     await client.sendMessage(chatId, {
       message: `/set_database_id ${databaseId}`,
     });
-    // TODO: check if bot replied with this databaseId
-    // expect(lastMessage.split(" ")[-1]).toEqual(databaseId)
+    // check if bot replied with this databaseId
+    const msgs = await client.getMessages(chatId, { limit: 1 });
+    const lastMessage: string = msgs[0].message;
+    console.log("lastMessage: ", lastMessage);
+    const databaseIdFromMessage = lastMessage.split(" ").pop();
+    console.log("databaseIdFromMessage: ", databaseIdFromMessage);
+    expect(databaseIdFromMessage).toEqual(databaseId);
   });
 
   // Summary should not exist in table yet, or create a new database yourself
