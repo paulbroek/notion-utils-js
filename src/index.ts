@@ -4,35 +4,22 @@ import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
 // import { WatchDirectoryFlags } from "typescript";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
-const pageId = process.env.NOTION_PAGE_ID as string;
+// const pageId = process.env.NOTION_PAGE_ID as string;
 // const databaseId = process.env.NOTION_DATABASE_ID as string;
-console.log("pageId: ", pageId);
+// console.log("pageId: ", pageId);
+
 // dummy method to verify if any data can be pulled from Notion API
-
-const getPage = async (pageId: string) => {
-  const response: any = await notion.pages.retrieve({ page_id: pageId });
-  console.log("response: ", response);
-  console.log("Object.keys(response): ", Object.keys(response));
-  console.log(
-    "response.properties.title.title: ",
-    response.properties.title.title
-  );
-  return response;
-};
-(async () => getPage(pageId))();
-
-// Can only fetch pages by parent page
-// const getPages = async (): Promise<null> => {};
-
-// const getPageProperties = async (pageId: string, propertyId: string) => {
-//   const response = await notion.pages.properties.retrieve({
-//     page_id: pageId,
-//     property_id: propertyId,
-//   });
+// const getPage = async (pageId: string) => {
+//   const response: any = await notion.pages.retrieve({ page_id: pageId });
 //   console.log("response: ", response);
+//   console.log("Object.keys(response): ", Object.keys(response));
+//   console.log(
+//     "response.properties.title.title: ",
+//     response.properties.title.title
+//   );
 //   return response;
 // };
-// (async () => getPageProperties(pageId))();
+// (async () => getPage(pageId))();
 
 const deletePage = async (pageId: string) => {
   // beset practice is to not actually delete, but set `archived` to true.
