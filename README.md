@@ -12,7 +12,6 @@ Create `./.env` file containing
 ```vim
 NOTION_API_KEY=...
 TELEGRAM_BOT_TOKEN=...
-NOTION_PAGE_ID=...
 NOTION_DATABASE_ID=...
 ```
 
@@ -58,7 +57,6 @@ assuming a file `~/repos/notion-utils-js/infra/secret.tfvars`:
 # pvt_key="..."
 NOTION_API_KEY="..."
 TELEGRAM_BOT_TOKEN="..."
-NOTION_PAGE_ID="..."
 NOTION_DATABASE_ID="..."
 ```
 

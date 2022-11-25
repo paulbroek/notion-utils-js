@@ -8,14 +8,15 @@ name: Run tests
 on:
   # schedule:
   #   - cron: "32 16 * * *"
+
   push:
     branches: ["dev", "main"]
     # branches: ["no_branch"]
     # Publish semver tags as releases.
     tags: ["v*.*.*"]
-  pull_request:
-    branches: ["main"]
-    # branches: ["no_branch"]
+
+  # pull_request:
+  #   branches: ["main"]
 
 env:
   TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
