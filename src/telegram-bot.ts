@@ -46,8 +46,7 @@ bot.command("quit", (ctx) => {
 
 const scrapeAndReply = async (ctx: Context, msg: string) => {
   // check if databaseId is set
-  const didSet: boolean = didSetDatabaseId(ctx);
-  if (!didSet) {
+  if (!didSetDatabaseId(ctx)) {
     return;
   }
 
@@ -125,8 +124,7 @@ bot.command("set_database_id", async (ctx) => {
 });
 
 bot.command("delete_last", async (ctx) => {
-  const didSet: boolean = didSetDatabaseId(ctx);
-  if (!didSet) {
+  if (!didSetDatabaseId(ctx)) {
     return;
   }
 
