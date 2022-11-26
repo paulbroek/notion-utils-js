@@ -13,6 +13,5 @@
     "command": "delete_last",
     "description": "Delete last added row in database"
   },
-  { "command": "help", "description": "Show help" },
-  { "command": "quit", "description": "Quit chat" }
+  { "command": "help", "description": "Show help" }
 ]

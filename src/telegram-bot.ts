@@ -38,12 +38,12 @@ bot.help((ctx) => {
   ctx.reply("chat_id is: " + ctx.message.chat.id);
 });
 
-bot.command("quit", (ctx) => {
-  // Explicit usage
-  ctx.telegram.leaveChat(ctx.message.chat.id);
-  // Context shortcut
-  ctx.leaveChat();
-});
+// bot.command("quit", (ctx) => {
+//   // Explicit usage
+//   ctx.telegram.leaveChat(ctx.message.chat.id);
+//   // Context shortcut
+//   ctx.leaveChat();
+// });
 
 const scrapeAndReply = async (ctx: Context, msg: string) => {
   // check if databaseId is set
