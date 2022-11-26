@@ -1,0 +1,18 @@
+[
+  { "command": "start", "description": "Start bot" },
+  { "command": "add", "description": "Add book summary to Notion database" },
+  {
+    "command": "get_current_database_id",
+    "description": "Get current database id"
+  },
+  {
+    "command": "set_database_id",
+    "description": "Set current database id"
+  },
+  {
+    "command": "delete_last",
+    "description": "Delete last added row in database"
+  },
+  { "command": "help", "description": "Show help" },
+  { "command": "quit", "description": "Quit chat" }
+]

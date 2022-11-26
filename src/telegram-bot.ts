@@ -1,6 +1,7 @@
 import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
+import { createBotCommandsSummary } from "./utils";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import {
   addSummaryToTable,
@@ -8,14 +9,14 @@ import {
   databaseExistsForUser,
   deleteLastSummary,
 } from ".";
-// const databaseId = process.env.NOTION_DATABASE_ID as string;
+import botCommands from "./bot-commands.json";
 let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
 
 const didSetDatabaseId = (ctx: Context): boolean => {
-  // TODO: turn into decorator that checks this
+  // TODO: turn into decorator that checks condition
   if (!databaseId) {
     ctx.reply(
       "please set a databaseId first using\n /set_database_id YOUR_DATABASE_ID"
@@ -57,31 +58,21 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   }
   const goodreadsUrl: string = msg;
 
-  // check if book exists
-  const bookExists: Boolean = await bookExistsInTable({
-    goodreadsUrl,
-    databaseId,
-  });
-  if (bookExists) {
-    // console.log("book exists");
+  if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
     ctx.reply("Book already exists in summary database");
     return;
   }
 
   // user feedback, send message when starting scrape process, delete it when finished / error
   const { message_id } = await ctx.reply("scraping..");
-  // console.log("message_id: ", message_id);
 
-  const res: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
-  // const res: null | bookScrapeItem = null;
+  const scrapeRes: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
   // ctx.reply(`res: ${JSON.stringify(res)}`);
   await ctx.deleteMessage(message_id);
 
   // create notion page, ask user first
-  if (res) {
-    // const { message_id } = await ctx.reply("creating record in Notion table..");
-    const addResult = await addSummaryToTable(res, databaseId);
-    // await ctx.deleteMessage(message_id);
+  if (scrapeRes) {
+    const addResult = await addSummaryToTable(scrapeRes, databaseId);
 
     if (!addResult) {
       ctx.reply("could not add result to Notion");
@@ -91,9 +82,10 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
       // FIXME: very ugly method, but notion API does not allow to see properties of response directly
       // See: https://github.com/makenotion/notion-sdk-js/issues/247
 
-      const recreatedObject = JSON.parse(JSON.stringify(addResult));
-      console.log("addResult.reparsed: ", recreatedObject.url);
-      ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
+      // const recreatedObject = JSON.parse(JSON.stringify(addResult));
+      // console.log("addResult.reparsed: ", recreatedObject.url);
+      // ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
+      ctx.reply(`Done! Visit the summary at: \n${addResult["url"]}`);
     }
   } else {
     ctx.reply("Could not scrape Goodreads page");
@@ -145,8 +137,22 @@ bot.command("add", async (ctx) => {
   await scrapeAndReply(ctx, msg);
 });
 
-bot.on("text", async (ctx) => {
-  await scrapeAndReply(ctx, ctx.message.text);
+// bot.on("text", async (ctx) => {
+//   await scrapeAndReply(ctx, ctx.message.text);
+// });
+
+bot.command("commands", async (ctx) => {
+  // TODO: print list of available commands, to be send to BotFather, and displayed as inline menu
+  // const commands = await bot.telegram.getMyCommands();
+  // const commands = await ctx.telegram.getMyCommands();
+  // TODO:: does not work
+  // console.log("commands: " + commands);
+  // ctx.reply(JSON.stringify(commands));
+
+  // console.log("botCommands: ", JSON.stringify(botCommands));
+
+  const s = createBotCommandsSummary(botCommands);
+  console.log("summary: \n\n" + s);
 });
 
 // TODO: ask user to optionally add reminders, they will be set in Notion

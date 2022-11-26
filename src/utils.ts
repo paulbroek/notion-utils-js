@@ -1,3 +1,5 @@
+import { BotCommand } from "telegraf/typings/core/types/typegram";
+
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const periodicallyDoTillCondition = async (
@@ -16,4 +18,9 @@ const periodicallyDoTillCondition = async (
   }
 };
 
-export { delay, periodicallyDoTillCondition };
+const createBotCommandsSummary = (botCommands: Array<BotCommand>): String => {
+  const res = botCommands.map((o) => `${o.command} - ${o.description}`);
+  return res.join("\n");
+};
+
+export { delay, periodicallyDoTillCondition, createBotCommandsSummary };
