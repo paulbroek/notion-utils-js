@@ -79,5 +79,5 @@ terraform destroy -auto-approve \
 yarn run test
 
 # run individual tests
-yarn jest __tests__/telegram.ts --force-exit
+yarn jest __tests__/telegram.ts --force-exit --runInBand
 ```

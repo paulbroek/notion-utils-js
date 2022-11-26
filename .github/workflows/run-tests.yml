@@ -43,4 +43,4 @@ jobs:
 
       - run: yarn install
       # - run: yarn test
-      - run: yarn jest __tests__/telegram.ts --forceExit
+      - run: yarn jest __tests__/telegram.ts --forceExit --runInBand
