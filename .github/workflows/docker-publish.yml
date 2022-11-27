@@ -12,7 +12,7 @@ on:
     branches: ["main"]
     # branches: ["no_branch"]
     # Publish semver tags as releases.
-    tags: ["v*.*.*"]
+    # tags: ["v*.*.*"]
   pull_request:
     branches: ["main"]
     # branches: ["no_branch"]
