@@ -18,7 +18,7 @@ const periodicallyDoTillCondition = async (
   }
 };
 
-const createBotCommandsSummary = (botCommands: Array<BotCommand>): String => {
+const createBotCommandsSummary = (botCommands: Array<BotCommand>): string => {
   const res = botCommands.map((o) => `${o.command} - ${o.description}`);
   return res.join("\n");
 };

@@ -1,13 +1,13 @@
 {
   "name": "notion-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "utility library for Notion",
   "main": "index.ts",
   "scripts": {
     "start": "ts-node ./dist/index.js",
     "build": "tsc -p .",
     "dev": "ts-node src/index.ts",
-    "test": "dotenv -e .env.test jest",
+    "test": "dotenv -e .env.test jest __tests__/telegram.ts --detectOpenHandles --forceExit --runInBand",
     "push": "dotenv -e .env.test -- prisma db push",
     "studio": "dotenv -e .env.test -- prisma studio"
   },
@@ -19,8 +19,9 @@
     "notion",
     "node",
     "js",
-    "api",
-    "rest"
+    "typescript",
+    "telegram",
+    "bot"
   ],
   "author": "Paul Broek",
   "license": "ISC",

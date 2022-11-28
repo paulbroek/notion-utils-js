@@ -2,8 +2,7 @@
 
 Utility library for Notion.so
 
-Inject contect into Notion pages using javascript.
-Includes a Telegram bot for creating content by interacting with the bot.
+Inject content into Notion database using Notion API `notionhq` with help of a Telegram bot.
 
 ## 0.1 Config
 
@@ -90,5 +89,16 @@ terraform destroy -auto-approve \
 yarn run test
 
 # run individual tests
-yarn jest __tests__/telegram.ts --force-exit --runInBand
+~/.yarn/bin/dotenv -e .env.test -- yarn jest __tests__/telegram.ts --force-exit --runInBand
+```
+
+## 3.0 Other
+
+Automatically update help menu for bot
+
+```bash
+# docker-compose -f docker-compose.test.yml build
+# or
+# yarn run tsc -p .
+yarn run tsc -p . && ~/.yarn/bin/dotenv -e .env.test node dist/telegram/update-instructions.js
 ```

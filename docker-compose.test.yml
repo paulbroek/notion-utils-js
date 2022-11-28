@@ -13,6 +13,7 @@ services:
       - .env.test
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
+      # - ./dist:/dist
 
   postgres:
     image: postgres:15.1-alpine
