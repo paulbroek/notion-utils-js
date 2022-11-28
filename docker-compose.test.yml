@@ -13,10 +13,11 @@ services:
       - .env.test
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
-      # - ./dist:/dist
 
   postgres:
     image: postgres:15.1-alpine
+    container_name: notion-telegram-postgres
+    # network_mode: host
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -27,7 +28,4 @@ services:
     env_file:
       - dbcredentials.env
     volumes:
-      - /data/notion-telegram:/var/lib/postgresql/data
-# volumes:
-#   db:
-#     driver: local
+      - /data/notion-telegram/test:/var/lib/postgresql/data

@@ -37,10 +37,12 @@ docker-compose -f docker-compose.test.yml logs -f
 ## 1.0b Deploy database
 
 ```bash
-sudo mkdir /data/notion-telegram
+sudo mkdir -p /data/notion-telegram/{test,prod}
 docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d postgres
 # step to reproduce db link
-yarn prisma init --datasource-provider postgresql
+~/.yarn/bin/dotenv -e .env.test -- yarn prisma init --datasource-provider postgresql
+# init tables
+~/.yarn/bin/dotenv -e .env.test -- yarn prisma db push
 ```
 
 ## 1.1 Deploy on Minikube
