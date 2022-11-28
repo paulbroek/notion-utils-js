@@ -39,6 +39,7 @@
   "devDependencies": {
     "input": "^1.0.1",
     "jest": "^29.3.1",
+    "prisma": "^4.6.1",
     "telegram": "^2.14.7",
     "ts-jest": "^29.0.3"
   }

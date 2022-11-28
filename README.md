@@ -26,11 +26,20 @@ TELEGRAM_SESSION_KEY=...
 
 After following instructions [here](https://github.com/gram-js/gramjs)
 
-## 1.0 Install, run and inspect
+## 1.0a Install bot, run and inspect
 
 ```bash
-docker-compose up -d --build
+docker-compose up -d telegram-bot --build
 docker-compose logs -f
+```
+
+## 1.0b Deploy database
+
+```bash
+sudo mkdir /data/notion-telegram
+docker-compose --env-file dbcredentials.env up -d db
+# steps to reproduce db link
+yarn prisma init --datasource-provider postgresql
 ```
 
 ## 1.1 Deploy on Minikube
