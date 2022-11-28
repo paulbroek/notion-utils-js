@@ -10,10 +10,13 @@ import {
   deleteLastSummary,
 } from ".";
 import botCommands from "./bot-commands.json";
+import { PrismaClient } from "@prisma/client";
 let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
+
+const prisma = new PrismaClient();
 
 const didSetDatabaseId = (ctx: Context): boolean => {
   // TODO: turn into decorator that checks condition
@@ -140,6 +143,11 @@ bot.command("add", async (ctx) => {
 // bot.on("text", async (ctx) => {
 //   await scrapeAndReply(ctx, ctx.message.text);
 // });
+
+bot.command("db", async (ctx) => {
+  const res = await prisma.user.findMany();
+  console.log("db res: ", JSON.stringify(res));
+});
 
 bot.command("commands", async (ctx) => {
   // TODO: print list of available commands, to be send to BotFather, and displayed as inline menu

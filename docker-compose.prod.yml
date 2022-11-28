@@ -14,7 +14,7 @@ services:
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
-  db:
+  postgres:
     image: postgres:15.1-alpine
     restart: unless-stopped
     environment:

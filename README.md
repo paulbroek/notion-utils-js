@@ -29,16 +29,18 @@ After following instructions [here](https://github.com/gram-js/gramjs)
 ## 1.0a Install bot, run and inspect
 
 ```bash
-docker-compose up -d telegram-bot --build
-docker-compose logs -f
+docker-compose -f docker-compose.test.yml up -d telegram-bot --build
+# including db
+docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d --build
+docker-compose -f docker-compose.test.yml logs -f
 ```
 
 ## 1.0b Deploy database
 
 ```bash
 sudo mkdir /data/notion-telegram
-docker-compose --env-file dbcredentials.env up -d db
-# steps to reproduce db link
+docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d postgres
+# step to reproduce db link
 yarn prisma init --datasource-provider postgresql
 ```
 
