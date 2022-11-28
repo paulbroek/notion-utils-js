@@ -21,4 +21,13 @@ model User {
   telegramId  String @unique
   isBot       Boolean @default(false)
   isPremium   Boolean @default(false)
+
+  messages Message[]
+}
+
+model Message {
+  id    Int    @id @default(autoincrement())
+  text String
+  user   User @relation(fields: [userId], references: [id])
+  userId Int 
 }

@@ -3,6 +3,7 @@ version: "3.4"
 services:
   telegram-bot:
     image: telegram-bot
+    container_name: notion-telegram-bot-prod
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -16,6 +17,7 @@ services:
 
   postgres:
     image: postgres:15.1-alpine
+    container_name: notion-telegram-postgres-prod
     restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
