@@ -11,8 +11,14 @@ datasource db {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  firstName String
-  lastName  String
-  telegramId String
+  id          Int    @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName   String?
+  lastName    String?
+  userName    String
+  languageCode String?
+  telegramId  String @unique
+  isBot       Boolean @default(false)
+  isPremium   Boolean @default(false)
 }

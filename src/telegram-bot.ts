@@ -2,6 +2,7 @@ import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { createBotCommandsSummary } from "./utils";
+// import { User } from "@prisma/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import {
   addSummaryToTable,
@@ -11,6 +12,8 @@ import {
 } from ".";
 import botCommands from "./bot-commands.json";
 import { PrismaClient } from "@prisma/client";
+// import { text } from "telegraf/typings/button";
+
 let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
@@ -102,15 +105,15 @@ bot.command("get_current_database_id", async (ctx) => {
 bot.command("set_database_id", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
   // console.log("msgs: ", JSON.stringify(msgs));
-  if (msgs.length == 1) {
+  if (msgs.length != 2) {
     ctx.reply("please pass one databaseId");
     return;
   }
   databaseId = msgs[1];
   // TODO: how to save this state when restarting bot?
-  // check if database exists for user
-  const databaseExists: boolean = await databaseExistsForUser(databaseId);
-  if (!databaseExists) {
+  // -> use DB to store user data
+  // database exists for user?
+  if (!(await databaseExistsForUser(databaseId))) {
     ctx.reply("databaseId does not exist for user");
     return;
   }
@@ -132,16 +135,44 @@ bot.command("delete_last", async (ctx) => {
 bot.command("add", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
   // console.log("msgs: ", JSON.stringify(msgs));
-  if (msgs.length == 1) {
-    ctx.reply("please pass an URL argument");
+  if (msgs.length != 2) {
+    ctx.reply("please pass one URL argument");
     return;
   }
   const msg = msgs[1];
+
+  // get or create user from DB
+  const telegramUserId: string = "" + ctx.message.from?.id;
+
+  const user = {
+    userName: "" + ctx.message.from?.username,
+    firstName: ctx.message.from?.first_name,
+    lastName: ctx.message.from?.last_name,
+    languageCode: "" + ctx.message.from?.language_code,
+    isBot: ctx.message.from?.is_bot,
+    isPremium: ctx.message.from.is_premium,
+    telegramId: telegramUserId,
+  };
+
+  await prisma.user.upsert({
+    create: user,
+    update: {
+      userName: "" + ctx.message.from?.username,
+      firstName: ctx.message.from?.first_name,
+      lastName: ctx.message.from?.last_name,
+    },
+    where: { telegramId: telegramUserId },
+  });
+  console.log("upserted user: " + telegramUserId);
+
   await scrapeAndReply(ctx, msg);
 });
 
 // bot.on("text", async (ctx) => {
-//   await scrapeAndReply(ctx, ctx.message.text);
+//   // await scrapeAndReply(ctx, ctx.message.text);
+//   const msg = "I got: " + ctx.message.text;
+//   console.log(msg);
+//   // ctx.reply(msg);
 // });
 
 bot.command("db", async (ctx) => {
@@ -150,20 +181,9 @@ bot.command("db", async (ctx) => {
 });
 
 bot.command("commands", async (ctx) => {
-  // TODO: print list of available commands, to be send to BotFather, and displayed as inline menu
-  // const commands = await bot.telegram.getMyCommands();
-  // const commands = await ctx.telegram.getMyCommands();
-  // TODO:: does not work
-  // console.log("commands: " + commands);
-  // ctx.reply(JSON.stringify(commands));
-
-  // console.log("botCommands: ", JSON.stringify(botCommands));
-
-  const s = createBotCommandsSummary(botCommands);
-  console.log("summary: \n\n" + s);
+  const summary = createBotCommandsSummary(botCommands);
+  console.log("summary: \n\n" + summary);
 });
-
-// TODO: ask user to optionally add reminders, they will be set in Notion
 
 bot.launch();
 

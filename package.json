@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node ./dist/index.js",
     "build": "tsc -p .",
-    "dev": "ts-node src/index.ts",
+    "dev": "nodemon src/telegram-bot.ts",
     "test": "dotenv -e .env.test jest __tests__/telegram.ts --detectOpenHandles --forceExit --runInBand",
     "push": "dotenv -e .env.test -- prisma db push",
     "studio": "dotenv -e .env.test -- prisma studio"
@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "jest": "^29.3.1",
+    "nodemon": "^2.0.20",
     "prisma": "^4.6.1",
     "ts-jest": "^29.0.3"
   }

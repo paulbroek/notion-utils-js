@@ -29,9 +29,16 @@ After following instructions [here](https://github.com/gram-js/gramjs)
 
 ```bash
 docker-compose -f docker-compose.test.yml up -d telegram-bot --build
+# rm and rerun in one line
+# alias dc="docker-compose"
+dc -f docker-compose.test.yml build && dc -f docker-compose.test.yml up -d telegram-bot && dc -f docker-compose.test.yml logs -f
 # including db
 docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d --build
 docker-compose -f docker-compose.test.yml logs -f
+
+# for fast debugging and development
+# export DATABASE_URL="postgresql://POSTGRES_USER:POSTGRES_PASS@localhost:5432/notion-telegram?schema=public" && yarn dev
+~/.yarn/bin/dotenv -e .env.test -- yarn dev
 ```
 
 ## 1.0b Deploy database
