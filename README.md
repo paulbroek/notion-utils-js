@@ -31,7 +31,7 @@ After following instructions [here](https://github.com/gram-js/gramjs)
 docker-compose -f docker-compose.test.yml up -d telegram-bot --build
 # rm and rerun in one line
 # alias dc="docker-compose"
-dc -f docker-compose.test.yml build && dc -f docker-compose.test.yml up -d telegram-bot && dc -f docker-compose.test.yml logs -f
+dc -f docker-compose.test.yml down && dc -f docker-compose.test.yml build && dc -f docker-compose.test.yml up -d telegram-bot && dc -f docker-compose.test.yml logs -f
 # including db
 docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d --build
 docker-compose -f docker-compose.test.yml logs -f

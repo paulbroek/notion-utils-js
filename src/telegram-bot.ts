@@ -3,7 +3,12 @@ import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { createBotCommandsSummary } from "./utils";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-import { upsertUser, pushMessage } from "./telegram";
+import {
+  upsertUser,
+  pushMessage,
+  upsertUserSettings,
+  getUserSettings,
+} from "./telegram";
 import {
   addSummaryToTable,
   bookExistsInTable,
@@ -117,6 +122,8 @@ bot.command("set_database_id", async (ctx) => {
     return;
   }
 
+  await upsertUserSettings(ctx.from.id, { databaseId: databaseId });
+
   ctx.reply("databaseId was set to: \n" + databaseId);
 });
 
@@ -143,6 +150,12 @@ bot.command("add", async (ctx) => {
   // get or create user from DB
   await upsertUser(ctx.message);
   await pushMessage(ctx.from.id, ctx.update.message);
+
+  // get userSettings
+  const res = await getUserSettings(ctx.from.id);
+  if (res?.databaseId) {
+    databaseId = res.databaseId;
+  }
 
   await scrapeAndReply(ctx, msg);
 });

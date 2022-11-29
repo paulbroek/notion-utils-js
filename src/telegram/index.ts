@@ -95,4 +95,38 @@ const pushMessage = async (telegramUserId: number, message: Message) => {
   console.debug(`pushed message: ${msgText}`);
 };
 
-export { connectTelegramClient, upsertUser, pushMessage };
+const getUserSettings = async (telegramUserId: number) => {
+  const userSettings = await prisma.userSettings.findFirst({
+    where: { user: { telegramId: telegramUserId } },
+  });
+  return userSettings;
+};
+
+const upsertUserSettings = async (telegramUserId: number, settings: object) => {
+  const user = await prisma.user.findFirst({
+    where: { telegramId: telegramUserId },
+  });
+
+  if (!user) {
+    console.error(`cannot find user ${telegramUserId}`);
+    return;
+  }
+
+  const userSettings = { userId: user.id, ...settings };
+
+  await prisma.userSettings.upsert({
+    create: userSettings,
+    update: settings,
+    where: { userId: user.id },
+  });
+
+  console.debug(`updated userSettings: ${JSON.stringify(userSettings)}`);
+};
+
+export {
+  connectTelegramClient,
+  upsertUser,
+  pushMessage,
+  getUserSettings,
+  upsertUserSettings,
+};
