@@ -13,5 +13,6 @@
     "command": "delete_last",
     "description": "Delete last added row in database"
   },
+  { "command": "bot_version", "description": "Show current version of bot" },
   { "command": "help", "description": "Show help" }
 ]

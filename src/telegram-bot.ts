@@ -3,10 +3,14 @@ import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { createBotCommandsSummary } from "./utils";
 import { bookScrapeItem } from "./models/bookScrapeItem";
+// import {version} from "../package.json';
+// import v from "../package.json";
+// const version = require('project-version');
+import version from "project-version";
 import {
   upsertUser,
   pushMessage,
-  upsertUserSettings,
+  updateUserSettings,
   getUserSettings,
 } from "./telegram";
 import {
@@ -18,22 +22,25 @@ import {
 import botCommands from "./bot-commands.json";
 import { PrismaClient } from "@prisma/client";
 
-let databaseId: string;
+// never save state here!
+// let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
 
 const prisma = new PrismaClient();
 
-const didSetDatabaseId = (ctx: Context): boolean => {
-  // TODO: turn into decorator that checks condition
-  if (!databaseId) {
+// TODO: turn into decorator that checks condition
+const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
+  const userSettings = await getUserSettings(ctx.from.id);
+  if (userSettings == null || !userSettings?.databaseId) {
     ctx.reply(
       "please set a databaseId first using\n /set_database_id YOUR_DATABASE_ID"
     );
-    return false;
+    return null;
   }
-  return true;
+
+  return userSettings.databaseId;
 };
 
 bot.start((ctx) => {
@@ -57,7 +64,8 @@ bot.help((ctx) => {
 
 const scrapeAndReply = async (ctx: Context, msg: string) => {
   // check if databaseId is set
-  if (!didSetDatabaseId(ctx)) {
+  const databaseId = await getAndWarnDatabaseId(ctx);
+  if (databaseId == null) {
     return;
   }
 
@@ -103,7 +111,8 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
 };
 
 bot.command("get_current_database_id", async (ctx) => {
-  ctx.reply("current databaseId: \n" + databaseId);
+  const userSettings = await getUserSettings(ctx.from.id);
+  ctx.reply("current databaseId: \n" + userSettings?.databaseId);
 });
 
 bot.command("set_database_id", async (ctx) => {
@@ -113,7 +122,7 @@ bot.command("set_database_id", async (ctx) => {
     ctx.reply("please pass one databaseId");
     return;
   }
-  databaseId = msgs[1];
+  const databaseId = msgs[1];
   // TODO: how to save this state when restarting bot?
   // -> use DB to store user data
   // database exists for user?
@@ -122,13 +131,14 @@ bot.command("set_database_id", async (ctx) => {
     return;
   }
 
-  await upsertUserSettings(ctx.from.id, { databaseId: databaseId });
+  await updateUserSettings(ctx.from.id, { databaseId: databaseId });
 
   ctx.reply("databaseId was set to: \n" + databaseId);
 });
 
 bot.command("delete_last", async (ctx) => {
-  if (!didSetDatabaseId(ctx)) {
+  const databaseId = await getAndWarnDatabaseId(ctx);
+  if (databaseId == null) {
     return;
   }
 
@@ -149,13 +159,7 @@ bot.command("add", async (ctx) => {
 
   // get or create user from DB
   await upsertUser(ctx.message);
-  await pushMessage(ctx.from.id, ctx.update.message);
-
-  // get userSettings
-  const res = await getUserSettings(ctx.from.id);
-  if (res?.databaseId) {
-    databaseId = res.databaseId;
-  }
+  // await pushMessage(ctx.from.id, ctx.update.message);
 
   await scrapeAndReply(ctx, msg);
 });
@@ -167,9 +171,15 @@ bot.command("add", async (ctx) => {
 //   // ctx.reply(msg);
 // });
 
-bot.command("db", async (ctx) => {
-  const res = await prisma.user.findMany();
-  console.log("db res: ", JSON.stringify(res));
+// bot.command("db", async (ctx) => {
+//   const res = await prisma.user.findMany();
+//   console.log("db res: ", JSON.stringify(res));
+// });
+
+bot.command("bot_version", async (ctx) => {
+  // const botVersion = "1.0.1";
+  // const botVersion = process.env.npm_package_version;
+  ctx.reply(`version of bot running: ${version}`);
 });
 
 bot.command("commands", async (ctx) => {

@@ -109,5 +109,6 @@ Automatically update help menu for bot
 # docker-compose -f docker-compose.test.yml build
 # or
 # yarn run tsc -p .
-yarn run tsc -p . && ~/.yarn/bin/dotenv -e .env.test -- node dist/telegram/update-instructions.js
+# yarn run tsc -p . && ~/.yarn/bin/dotenv -e .env.test -- node dist/telegram/update-instructions.js
+~/.yarn/bin/dotenv -e .env.test -- ts-node src/telegram/update-instructions.ts
 ```

@@ -1,4 +1,4 @@
-import { connectTelegramClient } from ".";
+import { connectTelegramClient, createTelegramClient } from ".";
 import { createBotCommandsSummary } from "../utils";
 import botCommands from "../bot-commands.json";
 
@@ -12,16 +12,32 @@ const CHAT_ID = "botfather";
 // const BOT_NAME = TELEGRAM_BOT_NAME;
 const BOT_NAME = TELEGRAM_BOT_NAME_TEST;
 
+const client = createTelegramClient(sessionKey);
+
 // parse commands from json file and push to botfather
-(async () => {
+async function main() {
+  if (!sessionKey) {
+    console.error("should pass sessionKey");
+    return;
+  }
+  await connectTelegramClient(client, sessionKey);
   const summary = createBotCommandsSummary(botCommands);
+
   // console.log(summary);
   const msgFlow = ["/cancel", "/setcommands", `@${BOT_NAME}`, summary];
-
-  const client = await connectTelegramClient(sessionKey);
 
   for (const [ix, msg] of msgFlow.entries()) {
     console.log(`send msg ${ix} to ${CHAT_ID}: \n${msg}`);
     await client.sendMessage(CHAT_ID, { message: msg });
   }
-})();
+}
+
+main()
+  .catch((e) => {
+    console.error(e.message);
+  })
+  .finally(async () => {
+    // not working? -> wait 30 seconds to finish
+    await client.disconnect();
+    await client.destroy();
+  });

@@ -12,16 +12,25 @@ const prisma = new PrismaClient();
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
 const apiHash: string = process.env.TELEGRAM_API_HASH as string;
 
-const connectTelegramClient = async (sessionKey: string) => {
+const createTelegramClient = (sessionKey: string) => {
   // when `sessionKey` is empty, automatically asks for user input
   const stringSession = new StringSession(sessionKey);
 
-  console.debug("Loading interactive example...");
   //   console.log("stringSession: ", stringSession, apiId, apiHash);
   const client = new TelegramClient(stringSession, apiId, apiHash, {
     connectionRetries: 5,
   });
 
+  return client;
+};
+
+const connectTelegramClient = async (
+  client: undefined | TelegramClient,
+  sessionKey: string
+) => {
+  if (!client) {
+    client = createTelegramClient(sessionKey);
+  }
   await client.start({
     phoneNumber: async () => await input.text("Please enter your number: "),
     password: async () => await input.text("Please enter your password: "),
@@ -96,14 +105,16 @@ const pushMessage = async (telegramUserId: number, message: Message) => {
 };
 
 const getUserSettings = async (telegramUserId: number) => {
+  // ): Promise<null | object> => {
   const userSettings = await prisma.userSettings.findFirst({
     where: { user: { telegramId: telegramUserId } },
   });
   return userSettings;
 };
 
-const upsertUserSettings = async (telegramUserId: number, settings: object) => {
-  const user = await prisma.user.findFirst({
+const updateUserSettings = async (telegramUserId: number, settings: object) => {
+  // TODO: rewrite this is into a single query, use `connect`?
+  const user = await prisma.user.findUnique({
     where: { telegramId: telegramUserId },
   });
 
@@ -120,13 +131,20 @@ const upsertUserSettings = async (telegramUserId: number, settings: object) => {
     where: { userId: user.id },
   });
 
+  // const res = await prisma.user.update({
+  //   data: { userSettings: settings },
+  //   where: { telegramId: telegramUserId },
+  // });
+
+  // console.debug(`updated userSettings: ${JSON.stringify(res)}`);
   console.debug(`updated userSettings: ${JSON.stringify(userSettings)}`);
 };
 
 export {
+  createTelegramClient,
   connectTelegramClient,
   upsertUser,
   pushMessage,
   getUserSettings,
-  upsertUserSettings,
+  updateUserSettings,
 };

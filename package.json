@@ -1,6 +1,6 @@
 {
   "name": "notion-utils",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "utility library for Notion",
   "main": "index.ts",
   "scripts": {
@@ -36,6 +36,7 @@
     "@types/puppeteer": "^5.4.7",
     "dotenv": "^16.0.3",
     "input": "^1.0.1",
+    "project-version": "^2.0.0",
     "puppeteer": "^19.0.0",
     "telegraf": "^4.10.0",
     "telegram": "^2.14.7",
