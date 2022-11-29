@@ -2,8 +2,8 @@ import { Context, Telegraf } from "telegraf";
 import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { createBotCommandsSummary } from "./utils";
-// import { User } from "@prisma/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
+import { upsertUser, pushMessage } from "./telegram";
 import {
   addSummaryToTable,
   bookExistsInTable,
@@ -12,7 +12,6 @@ import {
 } from ".";
 import botCommands from "./bot-commands.json";
 import { PrismaClient } from "@prisma/client";
-// import { text } from "telegraf/typings/button";
 
 let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
@@ -142,28 +141,8 @@ bot.command("add", async (ctx) => {
   const msg = msgs[1];
 
   // get or create user from DB
-  const telegramUserId: string = "" + ctx.message.from?.id;
-
-  const user = {
-    userName: "" + ctx.message.from?.username,
-    firstName: ctx.message.from?.first_name,
-    lastName: ctx.message.from?.last_name,
-    languageCode: "" + ctx.message.from?.language_code,
-    isBot: ctx.message.from?.is_bot,
-    isPremium: ctx.message.from.is_premium,
-    telegramId: telegramUserId,
-  };
-
-  await prisma.user.upsert({
-    create: user,
-    update: {
-      userName: "" + ctx.message.from?.username,
-      firstName: ctx.message.from?.first_name,
-      lastName: ctx.message.from?.last_name,
-    },
-    where: { telegramId: telegramUserId },
-  });
-  console.log("upserted user: " + telegramUserId);
+  await upsertUser(ctx.message);
+  await pushMessage(ctx.from.id, ctx.update.message);
 
   await scrapeAndReply(ctx, msg);
 });

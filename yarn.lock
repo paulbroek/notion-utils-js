@@ -590,6 +590,11 @@
   resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.6.1.tgz#ae31309cc0f600f2da22708697b3be4eb1e46f9e"
   integrity sha512-3u2/XxvxB+Q7cMXHnKU0CpBiUK1QWqpgiBv28YDo1zOIJE3FCF8DI2vrp6vuwjGt5h0JGXDSvmSf4D4maVjJdw==
 
+"@prisma/prisma-fmt-wasm@4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6":
+  version "4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6"
+  resolved "https://registry.yarnpkg.com/@prisma/prisma-fmt-wasm/-/prisma-fmt-wasm-4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6.tgz#d0ab2f4bac76da2767e242ced74b4257e839befe"
+  integrity sha512-Hc2i5nfAt3nLDUkQNWJcKFJaA9Avd5zz6t85w9SW7P0vGtFXScQ+xIu6znbULr9bc0pgTWejY1We2u/7EMxHWw==
+
 "@sinclair/typebox@^0.24.1":
   version "0.24.51"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.51.tgz#645f33fe4e02defe26f2f5c0410e1c094eac7f5f"
@@ -2546,6 +2551,13 @@ pkg-dir@^4.2.0:
   integrity sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==
   dependencies:
     find-up "^4.0.0"
+
+prettier-plugin-prisma@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-prisma/-/prettier-plugin-prisma-4.4.0.tgz#30d2681f2ad7e70c78534a71fc11bc78165eeef2"
+  integrity sha512-631zwtvHUjcuS+i83wkxE3LqizazojWie4Pkha9GL6r1UsochNUedvxfvWPCdw6Dpyawvc5UKkmxcb9aT9+xfg==
+  dependencies:
+    "@prisma/prisma-fmt-wasm" "4.4.0-66.f352a33b70356f46311da8b00d83386dd9f145d6"
 
 pretty-format@^29.0.0, pretty-format@^29.3.1:
   version "29.3.1"
