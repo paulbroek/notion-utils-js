@@ -68,7 +68,8 @@
   },
   "lint-staged": {
     "*.{js,ts,json,css,md,html}": [
-      "prettier --write ."
+      "prettier --write .",
+      "git add -A ."
     ],
     "*.{ts,tsx}": [
       "bash -c tsc -p tsconfig.json --skipLibCheck --noEmit"
