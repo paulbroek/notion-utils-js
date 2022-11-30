@@ -10,10 +10,10 @@ on:
   schedule:
     - cron: "0 7 * * *"
 
-  # push:
-  #   branches: ["test"]
-  #   # Publish semver tags as releases.
-  #   # tags: ["v*.*.*"]
+  push:
+    branches: ["dev"]
+    # Publish semver tags as releases.
+    # tags: ["v*.*.*"]
 
   pull_request:
     branches: ["main", "test"]
@@ -27,6 +27,14 @@ env:
   NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
 
 jobs:
+  tsc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install
+      - run: tsc -p .
+
   jest:
     runs-on: ubuntu-latest
 
