@@ -25,8 +25,8 @@ const createTelegramClient = (sessionKey: string) => {
 };
 
 const connectTelegramClient = async (
-  client: undefined | TelegramClient,
-  sessionKey: string
+  sessionKey: string,
+  client: undefined | TelegramClient = undefined
 ) => {
   if (!client) {
     client = createTelegramClient(sessionKey);

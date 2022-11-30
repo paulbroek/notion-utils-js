@@ -20,7 +20,7 @@ async function main() {
     console.error("should pass sessionKey");
     return;
   }
-  await connectTelegramClient(client, sessionKey);
+  await connectTelegramClient(sessionKey, client);
   const summary = createBotCommandsSummary(botCommands);
 
   // console.log(summary);
