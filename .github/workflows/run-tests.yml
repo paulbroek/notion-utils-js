@@ -27,9 +27,8 @@ env:
   NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
 
 jobs:
-  build:
+  jest:
     runs-on: ubuntu-latest
-    name: jest
 
     strategy:
       matrix:
@@ -46,17 +45,17 @@ jobs:
       # - run: yarn test
       - run: yarn jest __tests__/telegram.ts --forceExit --runInBand
 
-  test_something:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/create-outputs@v0.0.0-fake
-        id: test
-      - uses: LouisBrunner/checks-action@v1.1.1
-        if: always()
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Test XYZ
-          conclusion: ${{ job.status }}
-          output: |
-            {"summary":${{ steps.test.outputs.summary }}}
+  # test_something:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - uses: actions/create-outputs@v0.0.0-fake
+  #       id: test
+  #     - uses: LouisBrunner/checks-action@v1.1.1
+  #       if: always()
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         name: Test XYZ
+  #         conclusion: ${{ job.status }}
+  #         output: |
+  #           {"summary":${{ steps.test.outputs.summary }}}
