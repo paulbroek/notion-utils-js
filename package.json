@@ -53,7 +53,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "husky": "^8.0.0",
+    "husky": "^8.0.2",
     "jest": "^29.3.1",
     "lint-staged": "^13.0.4",
     "nodemon": "^2.0.20",
@@ -67,9 +67,12 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,css,md,html}": [
-      "prettier --double-quote --write",
-      "git add"
+    "*.{js,ts,json,css,md,html}": [
+      "prettier --write .",
+      "git add -A ."
+    ],
+    "*.{ts,tsx}": [
+      "bash -c tsc -p tsconfig.json --skipLibCheck --noEmit"
     ]
   }
 }

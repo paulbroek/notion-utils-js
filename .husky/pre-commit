@@ -3,4 +3,5 @@
 
 # npm test
 # prettier --write
-tsc -p .
+# tsc -p .
+npx lint-staged
