@@ -1,6 +1,6 @@
 {
   "name": "notion-utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "utility library for Notion",
   "main": "index.ts",
   "scripts": {
