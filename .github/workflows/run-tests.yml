@@ -16,7 +16,7 @@ on:
     # tags: ["v*.*.*"]
 
   # pull_request:
-  #   branches: ["main", "test"]
+  #   branches: ["main"]
 
 env:
   TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
