@@ -5,6 +5,9 @@ ENV NODE_ENV=production
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+
+RUN npm install -g npm@9.1.2
+RUN npm install husky -g
 RUN npm install --production --silent && mv node_modules ../
 # RUN node ../node_modules/puppeteer/install.js
 
@@ -17,7 +20,6 @@ RUN apt-get update && apt-get install gnupg wget -y && \
   apt-get install google-chrome-stable -y --no-install-recommends && \
   rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g npm@9.1.2
 
 # COPY /src .
 COPY . .
