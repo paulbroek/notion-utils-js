@@ -29,6 +29,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: jest
 
     strategy:
       matrix:

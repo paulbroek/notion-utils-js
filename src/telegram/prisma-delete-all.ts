@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-async function main() {
+async function main(): Promise<void> {
   // order determines order of table deletion
   // const tables = ["message", "userSettings", "user"];
   const tables = ["userSettings"];

@@ -15,7 +15,7 @@ const BOT_NAME = TELEGRAM_BOT_NAME_TEST;
 const client = createTelegramClient(sessionKey);
 
 // parse commands from json file and push to botfather
-async function main() {
+async function main(): Promise<void> {
   if (!sessionKey) {
     console.error("should pass sessionKey");
     return;

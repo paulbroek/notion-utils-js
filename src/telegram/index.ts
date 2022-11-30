@@ -1,9 +1,6 @@
-import { text } from "telegraf/typings/button";
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 import { Message } from "typegram";
-import { Context } from "telegraf";
-import { Update } from "typegram";
 import { PrismaClient } from "@prisma/client";
 import input from "input";
 
@@ -27,7 +24,7 @@ const createTelegramClient = (sessionKey: string) => {
 const connectTelegramClient = async (
   sessionKey: string,
   client: undefined | TelegramClient = undefined
-) => {
+): Promise<TelegramClient> => {
   if (!client) {
     client = createTelegramClient(sessionKey);
   }
@@ -87,7 +84,10 @@ const upsertUser = async (message: Message) => {
   console.log(`upserted user: ${telegramUserId}`);
 };
 
-const pushMessage = async (telegramUserId: number, message: Message) => {
+const pushMessage = async (
+  telegramUserId: number,
+  message: Message
+): Promise<undefined> => {
   // const telegramUserId: string = "" + message.from?.id;
   // const msgText: string = message.text;
   const msgText: string = "todo: make text";
