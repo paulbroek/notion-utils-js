@@ -7,9 +7,11 @@
     "start": "ts-node ./dist/index.js",
     "build": "tsc -p .",
     "dev": "nodemon src/telegram-bot.ts",
+    "lint": "./node_modules/.bin/eslint **/*{.js,.ts}",
     "test": "dotenv -e .env.test jest __tests__/telegram.ts --detectOpenHandles --forceExit --runInBand",
     "push": "dotenv -e .env.test -- prisma db push",
-    "studio": "dotenv -e .env.test -- prisma studio"
+    "studio": "dotenv -e .env.test -- prisma studio",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -51,10 +53,23 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
+    "husky": "^8.0.0",
     "jest": "^29.3.1",
+    "lint-staged": "^13.0.4",
     "nodemon": "^2.0.20",
     "prettier-plugin-prisma": "^4.4.0",
     "prisma": "^4.6.1",
     "ts-jest": "^29.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json,css,md,html}": [
+      "prettier --double-quote --write",
+      "git add"
+    ]
   }
 }
