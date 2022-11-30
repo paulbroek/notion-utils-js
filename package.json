@@ -7,7 +7,7 @@
     "start": "ts-node ./dist/index.js",
     "build": "tsc -p .",
     "dev": "nodemon src/telegram-bot.ts",
-    "lint": "./node_modules/.bin/eslint **/*{.js,.ts}",
+    "lint": "eslint ./",
     "test": "dotenv -e .env.test jest __tests__/telegram.ts --detectOpenHandles --forceExit --runInBand",
     "push": "dotenv -e .env.test -- prisma db push",
     "studio": "dotenv -e .env.test -- prisma studio",
