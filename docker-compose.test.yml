@@ -14,7 +14,7 @@ services:
       - .env.test
     command: ["node", "./dist/telegram-bot.js"]
     volumes:
-      - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
+         - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
   postgres:
     image: postgres:15.1-alpine
