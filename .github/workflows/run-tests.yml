@@ -16,7 +16,7 @@ on:
   #   # tags: ["v*.*.*"]
 
   pull_request:
-    branches: ["main", "test"]
+    branches: ["main"]
 
 env:
   TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
@@ -27,6 +27,14 @@ env:
   NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
 
 jobs:
+  tsc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install
+      - run: tsc -p .
+
   jest:
     runs-on: ubuntu-latest
 
