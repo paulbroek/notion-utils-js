@@ -2,7 +2,7 @@ version: "3.4"
 
 services:
   telegram-bot:
-    image: telegram-bot
+    image: notion-utils-js
     container_name: notion-telegram-bot-prod
     build:
       context: .
@@ -12,6 +12,7 @@ services:
       NODE_ENV: production
     env_file:
       - .env
+    command: ["node", "./dist/telegram-bot.js"]
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
