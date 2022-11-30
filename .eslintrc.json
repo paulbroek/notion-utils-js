@@ -12,9 +12,8 @@
     // "project": ["./tsconfig.json"]
   },
   "rules": {
-    // "semi": ["error", "never"],
-    "semi": "off",
-    // "quotes": [1, "double"]
+    // "semi": [1, "always"],
+    "semi": 0,
     "quotes": "off"
   },
   "plugins": ["@typescript-eslint"]
