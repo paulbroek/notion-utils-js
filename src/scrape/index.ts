@@ -1,9 +1,12 @@
 import { bookScrapeItem } from "./../models/bookScrapeItem";
+import { PrismaClient } from "@prisma/client";
 // from: https://github.com/dmtrbrl/goodreads-web-scraping/blob/master/index.js
 import puppeteer from "puppeteer";
 import { delay } from "../utils";
 // import fs from "fs";
 const fs = require("fs");
+
+const prisma = new PrismaClient();
 
 // const extractNumberFromString = (str: string): null | number => {
 //   const matches = str.match(/\d+/);
@@ -31,6 +34,8 @@ const scrapeBookRetry = async (
           console.log("complete");
         }
       );
+
+      // save to postgres
 
       return res;
     }

@@ -18,8 +18,13 @@ const periodicallyDoTillCondition = async (
   }
 };
 
-const createBotCommandsSummary = (botCommands: Array<BotCommand>): string => {
-  const res = botCommands.map((o) => `${o.command} - ${o.description}`);
+const createBotCommandsSummary = (
+  botCommands: Array<BotCommand>,
+  withDash = false
+): string => {
+  const res = botCommands.map(
+    (o) => `${withDash && "/"}` + `${o.command} - ${o.description}`
+  );
   return res.join("\n");
 };
 

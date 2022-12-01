@@ -46,3 +46,22 @@ model Message {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
 }
+
+model Author {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String
+  url       String
+  isbn      String?
+  published DateTime?
+  Book      Book[]
+}
+
+model Book {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    Author   @relation(fields: [authorId], references: [id])
+  authorId  String
+}
