@@ -69,8 +69,6 @@ const upsertUser = async (message: Message) => {
     telegramId: telegramUserId,
   };
 
-  // await prisma.user.create({ data: user });
-
   await prisma.user.upsert({
     create: user,
     update: {
@@ -105,7 +103,6 @@ const pushMessage = async (
 };
 
 const getUserSettings = async (telegramUserId: number) => {
-  // ): Promise<null | object> => {
   const userSettings = await prisma.userSettings.findFirst({
     where: { user: { telegramId: telegramUserId } },
   });
