@@ -35,3 +35,5 @@ USER node
 # CMD ["node", "-r", "ts-node/register", "index.ts"]
 # CMD ["node", "./dist/index.js"]
 # CMD ["node", "./dist/telegram-bot.js"]
+
+LABEL $(npm pkg get version)
