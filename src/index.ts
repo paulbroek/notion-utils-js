@@ -28,8 +28,52 @@ const deletePage = async (pageId: string) => {
   console.log("page deleted");
 };
 
+const deleteSummaryById = async (
+  databaseId: string,
+  goodreadsUrl: string,
+  allowOnlyNonEdited = true
+): Promise<string | undefined> => {
+  const response = await notion.databases.query({
+    database_id: databaseId,
+    filter: {
+      property: "Goodreads URL",
+      url: { equals: goodreadsUrl },
+    },
+
+    page_size: 1,
+  });
+  if (response.results.length == 0) {
+    const msg = "could not find book in table";
+    console.error(msg);
+    return msg;
+  }
+
+  const lastSummaryPage = response.results[0];
+  const lastSummaryId = lastSummaryPage.id;
+  const lastSummaryTitle =
+    lastSummaryPage["properties"]["Title"].title[0].text.content;
+
+  if (
+    allowOnlyNonEdited &&
+    lastSummaryPage["created_time"] != lastSummaryPage["last_edited_time"]
+  ) {
+    const msg = "cannot delete, since page was manually edited";
+    console.error(msg);
+    return msg;
+  }
+
+  try {
+    await deletePage(lastSummaryId);
+    console.log("deleted ", lastSummaryTitle);
+    return lastSummaryTitle;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const deleteLastSummary = async (
-  databaseId: string
+  databaseId: string,
+  allowOnlyNonEdited = true
 ): Promise<string | undefined> => {
   // 1. get summaries sorted by `Created time`
   const response = await notion.databases.query({
@@ -61,7 +105,10 @@ const deleteLastSummary = async (
   // 2. delete summary
   // 2.1 only allow to delete when page text is empty
   // retrieving page content is not easy, so use the difference between created_time and last_edited_time to determine if it has been manually edited
-  if (lastSummaryPage["created_time"] != lastSummaryPage["last_edited_time"]) {
+  if (
+    allowOnlyNonEdited &&
+    lastSummaryPage["created_time"] != lastSummaryPage["last_edited_time"]
+  ) {
     return "cannot delete, since page was manually edited";
   }
 
@@ -209,5 +256,6 @@ export {
   addSummaryToTable,
   bookExistsInTable,
   deleteLastSummary,
+  deleteSummaryById,
   databaseExistsForUser,
 };

@@ -6,7 +6,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 
-RUN npm install -g npm@9.1.2
+RUN npm install -g npm@9.1.3
 RUN npm install husky -g
 RUN npm install --production --silent && mv node_modules ../
 # RUN node ../node_modules/puppeteer/install.js

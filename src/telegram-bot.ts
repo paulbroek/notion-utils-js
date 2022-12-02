@@ -18,6 +18,7 @@ import {
   bookExistsInTable,
   databaseExistsForUser,
   deleteLastSummary,
+  deleteSummaryById,
 } from ".";
 import botCommands from "./bot-commands.json";
 import { PrismaClient } from "@prisma/client";
@@ -49,10 +50,14 @@ bot.start((ctx) => {
 
 bot.help((ctx) => {
   // TODO: send list of all commands
-  ctx.reply("Send /start to receive a greeting");
-  ctx.reply("Send /keyboard to receive a message with a keyboard");
-  ctx.reply("Send /quit to stop the bot");
-  ctx.reply("chat_id is: " + ctx.message.chat.id);
+
+  const summary = createBotCommandsSummary(botCommands, true);
+
+  // ctx.reply("Send /start to receive a greeting");
+  console.log("chat_id is: " + ctx.message.chat.id);
+
+  console.log("summary: \n\n" + summary);
+  ctx.reply("commands summary: \n\n" + summary);
 });
 
 // bot.command("quit", (ctx) => {
@@ -74,7 +79,8 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
     ctx.reply("please pass valid goodreads book URL");
     return;
   }
-  const goodreadsUrl: string = msg;
+  // throw away any url encoded queries
+  const goodreadsUrl: string = msg.split("?")[0];
 
   if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
     ctx.reply("Book already exists in summary database");
@@ -143,8 +149,26 @@ bot.command("delete_last", async (ctx) => {
   }
 
   // delete last added book summary, but only when text is empty (safety check)
-  const pageId = await deleteLastSummary(databaseId);
-  ctx.reply("deleted page: \n" + pageId);
+  const pageTitle = await deleteLastSummary(databaseId);
+  ctx.reply("deleted page: \n" + pageTitle);
+});
+
+bot.command("delete", async (ctx) => {
+  const msgs = ctx.update.message.text.split(" ");
+  if (msgs.length != 2) {
+    ctx.reply("please pass one bookId to delete");
+    return;
+  }
+  const goodreadsUrl = msgs[1];
+
+  const databaseId = await getAndWarnDatabaseId(ctx);
+  if (databaseId == null) {
+    return;
+  }
+
+  // delete book summary
+  const pageTitle = await deleteSummaryById(databaseId, goodreadsUrl);
+  ctx.reply("deleted page: \n" + pageTitle);
 });
 
 // both plain messages and /add commands will add summaries to Notion
@@ -182,10 +206,10 @@ bot.command("bot_version", async (ctx) => {
   ctx.reply(`version of bot running: ${version}`);
 });
 
-bot.command("commands", async (ctx) => {
-  const summary = createBotCommandsSummary(botCommands);
-  console.log("summary: \n\n" + summary);
-});
+// bot.command("commands", async (ctx) => {
+//   const summary = createBotCommandsSummary(botCommands);
+//   console.log("summary: \n\n" + summary);
+// });
 
 bot.launch();
 
