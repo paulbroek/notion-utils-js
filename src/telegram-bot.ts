@@ -3,9 +3,6 @@ import { Update } from "typegram";
 import scrapeBookRetry from "./scrape";
 import { createBotCommandsSummary } from "./utils";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-// import {version} from "../package.json';
-// import v from "../package.json";
-// const version = require('project-version');
 import version from "project-version";
 import {
   upsertUser,
