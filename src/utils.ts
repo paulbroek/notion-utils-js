@@ -7,14 +7,18 @@ const periodicallyDoTillCondition = async (
   async_callback: Function,
   callback_params: object,
   condition: boolean = true
-) => {
-  while (true) {
-    // console.log("call");
-    const res = await async_callback(callback_params);
-    if (res == condition) {
-      break;
+): Promise<Boolean> => {
+  try {
+    while (true) {
+      const res = await async_callback(callback_params);
+      if (res == condition) {
+        console.log("meets condition!");
+        return true;
+      }
+      await delay(every);
     }
-    await delay(every);
+  } finally {
+    return false;
   }
 };
 

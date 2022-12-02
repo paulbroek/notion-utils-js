@@ -46,6 +46,13 @@ const connectTelegramClient = async (
   return client;
 };
 
+const getLastMessage = async (client: TelegramClient, chatId: number) => {
+  const msgs = await client.getMessages(chatId, { limit: 1 });
+  const lastMessage: string = msgs[0].message;
+
+  return lastMessage;
+};
+
 const upsertUser = async (message: Message) => {
   if (!message.from) {
     console.error("message should have `from` property");
@@ -140,6 +147,7 @@ const updateUserSettings = async (telegramUserId: number, settings: object) => {
 export {
   createTelegramClient,
   connectTelegramClient,
+  getLastMessage,
   upsertUser,
   pushMessage,
   getUserSettings,
