@@ -10,7 +10,7 @@ const sessionKey: undefined | string = process.env
   .TELEGRAM_SESSION_KEY as string;
 
 const BOOK_URL =
-  "https://www.goodreads.com/book/show/56275562-economics-and-math-of-token-engineering-and-defi?ref=nav_sb_ss_1_39";
+  "https://www.goodreads.com/book/show/56275562-economics-and-math-of-token-engineering-and-defi";
 
 // TODO: turn connectTelegramClient into fixture?
 test("connect to Telegram and send message", async () => {
@@ -69,6 +69,11 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
 
     // 3. Check if page now exists in Notion database
     // test("3. Check if page now exists in Notion database", async () => {
+    await delay(1500);
+    // const justAddedBookExists: Boolean = await bookExistsInTable({
+    //   goodreadsUrl: BOOK_URL,
+    //   databaseId,
+    // });
     const justAddedBookExists: Boolean = await periodicallyDoTillCondition(
       1000,
       bookExistsInTable,
@@ -80,14 +85,14 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
 
     // 4. Delete summary from Notion database through Telegram and check if it is deleted
     // test("4. Delete summary from Notion database through Telegram and check if it is deleted", async () => {
-    await client.sendMessage(chatId, { message: "/delete_last" });
-    const lastBookNotExists: Boolean = await periodicallyDoTillCondition(
-      1000,
-      bookExistsInTable,
-      { goodreadsUrl: BOOK_URL, databaseId },
-      false
-    );
-    expect(lastBookNotExists).toEqual(true);
+    // await client.sendMessage(chatId, { message: `/delete ${BOOK_URL}` });
+    // const lastBookNotExists: Boolean = await periodicallyDoTillCondition(
+    //   1000,
+    //   bookExistsInTable,
+    //   { goodreadsUrl: BOOK_URL, databaseId },
+    //   false
+    // );
+    // expect(lastBookNotExists).toEqual(true);
     // });
 
     // TODO: add afterAll to close client connection
@@ -101,7 +106,14 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
   } finally {
     // reset state to default in case the test fails
     // TODO: implement delete by URL so the right row will get deleted
-    await client.sendMessage(chatId, { message: "/delete_last" });
+    await client.sendMessage(chatId, { message: `/delete ${BOOK_URL}` });
+    const lastBookNotExists: Boolean = await periodicallyDoTillCondition(
+      1000,
+      bookExistsInTable,
+      { goodreadsUrl: BOOK_URL, databaseId },
+      false
+    );
+    expect(lastBookNotExists).toEqual(true);
   }
 });
 
