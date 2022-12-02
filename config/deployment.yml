@@ -29,9 +29,9 @@ spec:
               value: <NOTION_API_KEY>
             - name: TELEGRAM_BOT_TOKEN
               value: <TELEGRAM_BOT_TOKEN>
-            - name: NOTION_PAGE_ID
-              value: <NOTION_PAGE_ID>
             - name: NOTION_DATABASE_ID
               value: <NOTION_DATABASE_ID>
+            - name: DATABASE_URL
+              value: <DATABASE_URL>
 
           imagePullPolicy: Always
