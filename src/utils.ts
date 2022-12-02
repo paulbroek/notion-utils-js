@@ -7,15 +7,21 @@ const periodicallyDoTillCondition = async (
   async_callback: Function,
   callback_params: object,
   condition: boolean = true
-) => {
+): Promise<Boolean> => {
+  // try {
   while (true) {
-    // console.log("call");
     const res = await async_callback(callback_params);
     if (res == condition) {
-      break;
+      console.log("meets condition!");
+      return true;
+      // break;
     }
     await delay(every);
   }
+  // } finally {
+  //   return false;
+  // }
+  return false;
 };
 
 const createBotCommandsSummary = (

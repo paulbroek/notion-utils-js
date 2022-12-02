@@ -18,6 +18,7 @@ import {
   bookExistsInTable,
   databaseExistsForUser,
   deleteLastSummary,
+  deleteSummaryById,
 } from ".";
 import botCommands from "./bot-commands.json";
 import { PrismaClient } from "@prisma/client";
@@ -148,8 +149,26 @@ bot.command("delete_last", async (ctx) => {
   }
 
   // delete last added book summary, but only when text is empty (safety check)
-  const pageId = await deleteLastSummary(databaseId);
-  ctx.reply("deleted page: \n" + pageId);
+  const pageTitle = await deleteLastSummary(databaseId);
+  ctx.reply("deleted page: \n" + pageTitle);
+});
+
+bot.command("delete", async (ctx) => {
+  const msgs = ctx.update.message.text.split(" ");
+  if (msgs.length != 2) {
+    ctx.reply("please pass one bookId to delete");
+    return;
+  }
+  const goodreadsUrl = msgs[1];
+
+  const databaseId = await getAndWarnDatabaseId(ctx);
+  if (databaseId == null) {
+    return;
+  }
+
+  // delete book summary
+  const pageTitle = await deleteSummaryById(databaseId, goodreadsUrl);
+  ctx.reply("deleted page: \n" + pageTitle);
 });
 
 // both plain messages and /add commands will add summaries to Notion

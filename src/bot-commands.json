@@ -10,6 +10,10 @@
     "description": "Set current database id"
   },
   {
+    "command": "delete",
+    "description": "Delete row from database by bookId"
+  },
+  {
     "command": "delete_last",
     "description": "Delete last added row in database"
   },
