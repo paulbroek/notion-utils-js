@@ -7,6 +7,7 @@ import { delay } from "../utils";
 const fs = require("fs");
 
 const prisma = new PrismaClient();
+const ENABLE_JSON_DUMP = false;
 
 // const extractNumberFromString = (str: string): null | number => {
 //   const matches = str.match(/\d+/);
@@ -24,18 +25,20 @@ const scrapeBookRetry = async (
     console.log("Block statement execution no." + i);
     const res: null | bookScrapeItem = await scrapeBook(url);
     if (res != null) {
-      // dump to json file?
-      fs.writeFile(
-        "/tmp/scrapeItem.json",
-        JSON.stringify(res),
-        "utf8",
-        function (err) {
-          if (err) throw err;
-          console.log("complete");
-        }
-      );
+      if (ENABLE_JSON_DUMP) {
+        // dump to json file?
+        fs.writeFile(
+          "/tmp/scrapeItem.json",
+          JSON.stringify(res),
+          "utf8",
+          function (err) {
+            if (err) throw err;
+            console.log("complete");
+          }
+        );
+      }
 
-      // save to postgres
+      // TODO: save to postgres
 
       return res;
     }
@@ -46,7 +49,7 @@ const scrapeBookRetry = async (
 };
 
 const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
-  console.log("Warming up a scrapper");
+  console.log("Warming up a scraper");
 
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
