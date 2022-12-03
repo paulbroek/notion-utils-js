@@ -7,6 +7,7 @@ import { delay } from "../utils";
 const fs = require("fs");
 
 const prisma = new PrismaClient();
+const ENABLE_JSON_DUMP = false;
 
 // const extractNumberFromString = (str: string): null | number => {
 //   const matches = str.match(/\d+/);
@@ -23,7 +24,7 @@ const scrapeBookRetry = async (
   for (let i = 0; i < nRetry; i++) {
     console.log("Block statement execution no." + i);
     const res: null | bookScrapeItem = await scrapeBook(url);
-    if (res != null) {
+    if (ENABLE_JSON_DUMP && res != null) {
       // dump to json file?
       fs.writeFile(
         "/tmp/scrapeItem.json",
