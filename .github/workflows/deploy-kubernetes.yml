@@ -15,7 +15,6 @@ on:
   workflow_run:
     workflows: ["Docker push"]
     # branches: [main]
-    branches: [no_branch]
     types:
       - completed
 
