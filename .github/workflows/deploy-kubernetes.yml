@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Update SHA
         run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/src/_meta
@@ -84,6 +84,5 @@ jobs:
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-      # TODO: verification not working
       - name: Verify deployment
         run: kubectl rollout status deployment/notion-telegram-bot-js
