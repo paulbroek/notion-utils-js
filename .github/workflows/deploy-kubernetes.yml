@@ -71,7 +71,7 @@ jobs:
           sed -i 's|<TELEGRAM_BOT_TOKEN>|${{ secrets.TELEGRAM_BOT_TOKEN }}|' $GITHUB_WORKSPACE/config/deployment.yml
           sed -i 's|<NOTION_PAGE_ID>|${{ secrets.NOTION_DATABASE_ID }}|' $GITHUB_WORKSPACE/config/deployment.yml
           sed -i 's|<NOTION_DATABASE_ID>|${{ secrets.NOTION_DATABASE_ID }}|' $GITHUB_WORKSPACE/config/deployment.yml
-          # sed -i 's|<DATABASE_URL>|${{ secrets.DATABASE_URL }}|' $GITHUB_WORKSPACE/config/deployment.yml
+          sed -i 's|<DATABASE_URL>|${{ secrets.DATABASE_URL }}|' $GITHUB_WORKSPACE/config/deployment.yml
           cat $GITHUB_WORKSPACE/config/deployment.yml
 
       - name: Update deployment file
