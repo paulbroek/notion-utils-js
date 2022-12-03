@@ -12,6 +12,8 @@ Create `./.env` file containing
 NOTION_API_KEY=...
 TELEGRAM_BOT_TOKEN=...
 NOTION_DATABASE_ID=...
+SERVER_USER=...
+SERVER_ADDR=...
 ```
 
 And `./config/.env.test` containing
@@ -28,6 +30,9 @@ After following instructions [here](https://github.com/gram-js/gramjs)
 ## 1.0a Install bot, run and inspect
 
 ```bash
+# syncing .env.test file, update .env first with server details
+~/.yarn/bin/dotenv -e .env make sync_env_to_server
+
 docker-compose -f docker-compose.test.yml up -d telegram-bot --build
 # rm and rerun in one line
 # alias dc="docker-compose"
