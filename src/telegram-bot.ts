@@ -114,6 +114,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
 };
 
 bot.command("get_current_database_id", async (ctx) => {
+  console.log("DATABASE_URL: ", process.env.DATABASE_URL);
   const userSettings = await getUserSettings(ctx.from.id);
   ctx.reply("current databaseId: \n" + userSettings?.databaseId);
 });
