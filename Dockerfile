@@ -1,4 +1,3 @@
-# FROM node:lts-alpine
 FROM node:slim
 ENV NODE_ENV=production
 # We don't need the standalone Chromium
@@ -9,7 +8,6 @@ COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 RUN npm install -g npm@9.1.3
 RUN npm install husky -g
 RUN npm install --production --silent && mv node_modules ../
-# RUN node ../node_modules/puppeteer/install.js
 
 # Install Google Chrome Stable and fonts
 # Note: this installs the necessary libs to make the browser work with Puppeteer.
@@ -20,20 +18,11 @@ RUN apt-get update && apt-get install gnupg wget -y && \
   apt-get install google-chrome-stable -y --no-install-recommends && \
   rm -rf /var/lib/apt/lists/*
 
-
 # COPY /src .
 COPY . .
-# RUN chown -R node /usr/src/app
-# RUN chown -R node /dist/
 RUN npm run build
 
 # generate prisma client
 RUN npx prisma generate
 
 USER node
-# CMD ["node", "index.ts"]
-# CMD ["node", "-r", "ts-node/register", "index.ts"]
-# CMD ["node", "./dist/index.js"]
-# CMD ["node", "./dist/telegram-bot.js"]
-
-LABEL $(npm pkg get version)
