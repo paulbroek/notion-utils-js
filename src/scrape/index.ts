@@ -24,19 +24,21 @@ const scrapeBookRetry = async (
   for (let i = 0; i < nRetry; i++) {
     console.log("Block statement execution no." + i);
     const res: null | bookScrapeItem = await scrapeBook(url);
-    if (ENABLE_JSON_DUMP && res != null) {
-      // dump to json file?
-      fs.writeFile(
-        "/tmp/scrapeItem.json",
-        JSON.stringify(res),
-        "utf8",
-        function (err) {
-          if (err) throw err;
-          console.log("complete");
-        }
-      );
+    if (res != null) {
+      if (ENABLE_JSON_DUMP) {
+        // dump to json file?
+        fs.writeFile(
+          "/tmp/scrapeItem.json",
+          JSON.stringify(res),
+          "utf8",
+          function (err) {
+            if (err) throw err;
+            console.log("complete");
+          }
+        );
+      }
 
-      // save to postgres
+      // TODO: save to postgres
 
       return res;
     }
@@ -47,7 +49,7 @@ const scrapeBookRetry = async (
 };
 
 const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
-  console.log("Warming up a scrapper");
+  console.log("Warming up a scraper");
 
   const browser = await puppeteer.launch({
     executablePath: "/usr/bin/google-chrome",
