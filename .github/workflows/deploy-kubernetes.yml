@@ -72,18 +72,14 @@ jobs:
       #     # cat .env
       #     source .env
 
-      - name: Update env variables
+      - name: Update env variables in deployment file
         run: |
           sed -i 's|<NOTION_API_KEY>|${{ secrets.NOTION_API_KEY }}|' $GITHUB_WORKSPACE/config/deployment.yml
           sed -i 's|<TELEGRAM_BOT_TOKEN>|${{ secrets.TELEGRAM_BOT_TOKEN }}|' $GITHUB_WORKSPACE/config/deployment.yml
           sed -i 's|<NOTION_DATABASE_ID>|${{ secrets.NOTION_DATABASE_ID }}|' $GITHUB_WORKSPACE/config/deployment.yml
           sed -i 's|<DATABASE_URL>|${{ secrets.DATABASE_URL }}|' $GITHUB_WORKSPACE/config/deployment.yml
+          TAG=main && sed -i 's|<IMAGE>|ghcr.io/paulbroek/notion-utils-js:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
           cat $GITHUB_WORKSPACE/config/deployment.yml
-
-      - name: Update deployment file
-        # run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/asb/static-example:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
-        # run: TAG=$(echo $GITHUB_SHA) && sed -i 's|<IMAGE>|ghcr.io/paulbroek/notion-utils-js:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
-        run: TAG=main && sed -i 's|<IMAGE>|ghcr.io/paulbroek/notion-utils-js:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.DIGITAL_OCEAN_CLUSTER_NAME }}
