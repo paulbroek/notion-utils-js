@@ -63,7 +63,9 @@ docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d pos
 
 ```bash
 # kubectl create deployment notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js
-kubectl run notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js --image-pull-policy=Never
+# not working?
+# kubectl run notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js --image-pull-policy=Never
+~/.yarn/bin/dotenv -e .env.test -- bash scripts/deploy-minikube.sh
 ```
 
 ## 1.2 Deploy infrastructure
