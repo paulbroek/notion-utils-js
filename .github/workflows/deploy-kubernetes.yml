@@ -18,8 +18,13 @@ on:
     types:
       - completed
 
-  # to allow manual runs
+  # for manual runs
   workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch to run the workflow for"
+        required: true
+        default: "main"
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -35,6 +40,8 @@ jobs:
     steps:
       - name: Checkout main
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Update SHA
         run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/src/_meta

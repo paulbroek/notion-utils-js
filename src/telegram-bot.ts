@@ -18,7 +18,6 @@ import {
   deleteSummaryById,
 } from ".";
 import botCommands from "./bot-commands.json";
-import { PrismaClient } from "@prisma/client";
 
 // never save state here!
 // let databaseId: string;
@@ -26,7 +25,6 @@ const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
 
-const prisma = new PrismaClient();
 const NOT_IMPLEMENTED = "command not implemented yet";
 
 // TODO: turn into decorator that checks condition
