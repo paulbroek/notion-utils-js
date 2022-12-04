@@ -110,6 +110,7 @@ const pushMessage = async (
 };
 
 const getUserSettings = async (telegramUserId: number) => {
+  console.log("telegramUserId: ", telegramUserId);
   const userSettings = await prisma.userSettings.findFirst({
     where: { user: { telegramId: telegramUserId } },
   });

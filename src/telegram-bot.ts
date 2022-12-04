@@ -27,6 +27,7 @@ const bot: Telegraf<Context<Update>> = new Telegraf(
 );
 
 const prisma = new PrismaClient();
+const NOT_IMPLEMENTED = "command not implemented yet";
 
 // TODO: turn into decorator that checks condition
 const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
@@ -138,6 +139,11 @@ bot.command("set_database_id", async (ctx) => {
   await updateUserSettings(ctx.from.id, { databaseId: databaseId });
 
   ctx.reply("databaseId was set to: \n" + databaseId);
+});
+
+bot.command("repeat_last", async (ctx) => {
+  // TODO: get last command from database
+  ctx.reply(NOT_IMPLEMENTED);
 });
 
 bot.command("delete_last", async (ctx) => {
