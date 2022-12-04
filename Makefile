@@ -1,3 +1,6 @@
+.PHONY: install
+install:
+	yarn install
 ## Run tests with jest
 .PHONY: test
 test:
@@ -10,9 +13,9 @@ bot:
 		docker-compose -f docker-compose.test.yml up -d telegram-bot &&\
 		docker-compose -f docker-compose.test.yml logs -f
 
-.PHONY: install
-install:
-	yarn install
+.PHONY: logs
+logs: 
+	docker logs notion-telegram-bot-test -f 
 
 sync_env_to_here:
 	rsync -avz -e ssh $(SERVER_USER)@$(SERVER_ADDR):~/repos/notion-utils-js/.env.test ~/repos/notion-utils-js 
