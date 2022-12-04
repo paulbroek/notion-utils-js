@@ -16,6 +16,10 @@ bot:
 .PHONY: logs
 logs: 
 	docker logs notion-telegram-bot-test -f 
+	
+.PHONY: clean
+clean: 
+	docker rm -f notion-telegram-bot-test
 
 sync_env_to_here:
 	rsync -avz -e ssh $(SERVER_USER)@$(SERVER_ADDR):~/repos/notion-utils-js/.env.test ~/repos/notion-utils-js 
