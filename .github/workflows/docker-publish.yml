@@ -14,6 +14,14 @@ on:
   # pull_request:
   #   branches: ["main"]
 
+  # to allow manual runs
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch to run the workflow for"
+        required: true
+        default: "main"
+
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -33,6 +41,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
