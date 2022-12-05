@@ -42,7 +42,6 @@ docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d --b
 docker-compose -f docker-compose.test.yml logs -f
 
 # for fast debugging and development
-# export DATABASE_URL="postgresql://POSTGRES_USER:POSTGRES_PASS@localhost:5432/notion-telegram?schema=public" && yarn dev
 ~/.yarn/bin/dotenv -e .env.test -- yarn dev
 ```
 
@@ -86,6 +85,7 @@ assuming a file `~/repos/notion-utils-js/infra/secret.tfvars`:
 NOTION_API_KEY="..."
 TELEGRAM_BOT_TOKEN="..."
 NOTION_DATABASE_ID="..."
+DATABASE_URL="..."
 ```
 
 ## 1.3 Destroy infrastructure

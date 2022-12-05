@@ -25,7 +25,8 @@ spec:
           command: ["node", "./dist/telegram-bot.js"]
           env:
             - name: NODE_ENV
-              value: production
+              # value: production
+              value: test
             - name: NOTION_API_KEY
               value: <NOTION_API_KEY>
             - name: TELEGRAM_BOT_TOKEN

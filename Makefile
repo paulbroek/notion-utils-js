@@ -1,6 +1,7 @@
 .PHONY: install
 install:
 	yarn install
+	
 ## Run tests with jest
 .PHONY: test
 test:
@@ -8,10 +9,10 @@ test:
 
 .PHONY: bot
 bot:
-	docker rm -f notion-telegram-bot-test &&\
-		docker-compose -f docker-compose.test.yml build &&\
-		docker-compose -f docker-compose.test.yml up -d telegram-bot &&\
-		docker-compose -f docker-compose.test.yml logs -f
+	docker rm -f notion-telegram-bot-test && \
+	docker-compose -f docker-compose.test.yml build && \
+	docker-compose -f docker-compose.test.yml up -d telegram-bot && \
+	docker-compose -f docker-compose.test.yml logs -f
 
 .PHONY: logs
 logs: 
