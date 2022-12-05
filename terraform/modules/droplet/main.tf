@@ -4,42 +4,41 @@
 #   regions = ["ams3"]
 # }
 
-variable "NOTION_API_KEY" {
-    type = string
-    # sensitive   = true
-}
-variable "TELEGRAM_BOT_TOKEN" {
-    type = string
-    # sensitive   = true
-}
-variable "NOTION_DATABASE_ID" {
-    type = string
-    # sensitive   = true
-}
-variable "DATABASE_URL" {
-    type = string
-    # sensitive   = true
+# provider "digitalocean" {
+#   config_file = "../provider.tf"
+# }
+
+terraform {
+  required_version = ">= 1.0.0, < 2.0.0"
+
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
 }
 
-resource "digitalocean_droplet" "www-1" {
-    image = "docker-20-04"
-    # image = digitalocean_custom_image.ubuntu_with_docker.id
-    name = "www-1"
-    region = "ams3"
-    size = "s-1vcpu-1gb"
-    ssh_keys = [
-      data.digitalocean_ssh_key.terraform.id
-    ]
+resource "droplet" "notion-telegram-bot" {
+  image = "docker-20-04"
+  # image = digitalocean_custom_image.ubuntu_with_docker.id
+  name   = "notion-telegram-bot"
+  region = "ams3"
+  size   = "s-1vcpu-1gb"
+  ssh_keys = [
+    data.digitalocean_ssh_key.terraform.id
+  ]
+  provider = digitalocean.env1
 
-connection {
-    host = self.ipv4_address
-    user = "root"
-    type = "ssh"
+  connection {
+    host        = self.ipv4_address
+    user        = "root"
+    type        = "ssh"
     private_key = file(var.pvt_key)
-    timeout = "3m"
+    timeout     = "3m"
   }
 
-provisioner "remote-exec" {
+  provisioner "remote-exec" {
     inline = [
       "export PATH=$PATH:/usr/bin",
       # clone and deploy
@@ -55,11 +54,11 @@ provisioner "remote-exec" {
     ]
   }
 
-# provisioner "remote-exec" {
-#     scripts = [
-#       "/root/notion-utils-js/scripts/echo_var.sh"
-#     ]
-#   }
+  # provisioner "remote-exec" {
+  #     scripts = [
+  #       "/root/notion-utils-js/scripts/echo_var.sh"
+  #     ]
+  #   }
 }
 
 # resource "digitalocean_project" "notion-telegram-bot" {

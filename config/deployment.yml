@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: notion-telegram-bot-js
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: notion-telegram-bot-js
@@ -22,7 +22,15 @@ spec:
             limits:
               cpu: 100m
               memory: 328Mi
+
           command: ["node", "./dist/telegram-bot.js"]
+          # command:
+          #   - /bin/sh
+          #   - -c
+          #   - |
+          #     ~/.yarn/bin/dotenv -e .env make sync_env_to_here
+          #     node ./dist/telegram-bot.js
+
           env:
             - name: NODE_ENV
               # value: production

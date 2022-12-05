@@ -10,12 +10,12 @@ lerna-debug.log*
 # .dockerignore
 
 # Terraform
-infra/.terraform
-infra/*.tfplan
-infra/*.tfstate
-infra/*.tfstate.backup
-infra/*.tfvars
-infra/.terraform.tfstate.lock.info
+*.terraform
+*.tfplan
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.tfstate.lock.info
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

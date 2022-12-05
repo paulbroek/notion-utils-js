@@ -70,14 +70,14 @@ docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d pos
 ## 1.2 Deploy infrastructure
 
 ```bash
-cd ~/repos/notion-utils-js/infra
+cd ~/repos/notion-utils-js/terraform
 terraform apply -auto-approve \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
-    -var-file="secret.tfvars"
+    -var-file="vars/test.tfvars"
 ```
 
-assuming a file `~/repos/notion-utils-js/infra/secret.tfvars`:
+assuming a file `~/repos/notion-utils-js/terraform/vars/test.tfvars`:
 
 ```vim
 # do_token="..."
@@ -91,11 +91,11 @@ DATABASE_URL="..."
 ## 1.3 Destroy infrastructure
 
 ```bash
-cd ~/repos/notion-utils-js/infra
+cd ~/repos/notion-utils-js/terraform
 terraform destroy -auto-approve \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
-    -var-file="secret.tfvars"
+    -var-file="vars/test.tfvars"
 ```
 
 ## 2.0 Testing
