@@ -23,6 +23,7 @@ COPY . .
 RUN npm run build
 
 # generate prisma client
+RUN yarn add @prisma/client
 RUN npx prisma generate
 
 # install ts-node for easy pod debugging
