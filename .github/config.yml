@@ -1,0 +1,21 @@
+# .github/config.yml
+# Default configuration for automerging pull requests
+# https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/configuring-automatic-merging-of-pull-requests
+
+# Default branch name for automerging
+defaultBranch: main
+
+# List of labels that should be applied to pull requests that can be automerged
+automergeLabels:
+  - ready-to-merge
+
+# List of labels that should be applied to pull requests that can be automerged
+# and can skip the required reviews.
+skipReviewLabels:
+  - quick-fix
+
+# Maximum number of changes in a pull request to automerge
+maxChanges: 500
+
+# Maximum number of days a pull request can be open before automerging
+maxDaysOpen: 5
