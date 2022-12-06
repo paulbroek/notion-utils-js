@@ -75,10 +75,22 @@ Always export `DO_PAT` first:
 export DO_PAT=...
 ```
 
-Plan infrastructure:
+and assuming a file `~/repos/notion-utils-js/terraform/env/k8s_test/secret.tfvars`:
+
+```vim
+# do_token="..."
+# pvt_key="..."
+NOTION_API_KEY="..."
+TELEGRAM_BOT_TOKEN="..."
+NOTION_DATABASE_ID="..."
+DATABASE_URL="..."
+```
+
+Initialize and plan infrastructure:
 
 ```bash
 cd ~/repos/notion-utils-js/terraform/env/k8s_test
+terraform init
 terraform plan -out="terraform.tfplan" \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
@@ -102,25 +114,14 @@ cd ~/repos/notion-utils-js/terraform
 terraform -chdir="./env/k8s_test" apply "terraform.tfplan"
 ```
 
-assuming a file `~/repos/notion-utils-js/terraform/env/k8s_test/secret.tfvars`:
-
-```vim
-# do_token="..."
-# pvt_key="..."
-NOTION_API_KEY="..."
-TELEGRAM_BOT_TOKEN="..."
-NOTION_DATABASE_ID="..."
-DATABASE_URL="..."
-```
-
 ## 1.3 Destroy infrastructure
 
 ```bash
-cd ~/repos/notion-utils-js/terraform
+cd ~/repos/notion-utils-js/terraform/env/k8s_test
 terraform destroy -auto-approve \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
-    -var-file="vars/test.tfvars"
+    -var-file="../../secrets/secret.tfvars"
 ```
 
 ## 2.0 Testing
