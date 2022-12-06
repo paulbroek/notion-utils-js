@@ -139,6 +139,18 @@ bot.command("set_database_id", async (ctx) => {
   ctx.reply("databaseId was set to: \n" + databaseId);
 });
 
+bot.command("reset_database_id", async (ctx) => {
+  const newDatabaseId = null;
+  await updateUserSettings(ctx.from.id, { databaseId: newDatabaseId });
+
+  ctx.reply("databaseId was set to: \n" + newDatabaseId);
+});
+
+bot.command("nrow", async () => {
+  // TODO: implement method
+  // get number of rows in database
+});
+
 bot.command("repeat_last", async (ctx) => {
   // TODO: get last command from database
   ctx.reply(NOT_IMPLEMENTED);

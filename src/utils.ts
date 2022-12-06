@@ -28,8 +28,9 @@ const createBotCommandsSummary = (
   botCommands: Array<BotCommand>,
   withDash = false
 ): string => {
+  const pfx = withDash ? "/" : "";
   const res = botCommands.map(
-    (o) => `${withDash && "/"}` + `${o.command} - ${o.description}`
+    (o) => `${pfx}` + `${o.command} - ${o.description}`
   );
   return res.join("\n");
 };
