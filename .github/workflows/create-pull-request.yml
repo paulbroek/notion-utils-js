@@ -22,6 +22,6 @@ jobs:
           # get last pull-request id
           prId=$(gh pr list | awk '{print $1}')
           # auto-merge pull-request
-          gh pr merge $prId --auto -m
+          gh pr merge $prId --auto -md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
