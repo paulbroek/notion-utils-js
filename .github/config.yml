@@ -1,4 +1,5 @@
 # .github/config.yml
+# TODO: this file is not being used in workflows
 # Default configuration for automerging pull requests
 # https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/configuring-automatic-merging-of-pull-requests
 
