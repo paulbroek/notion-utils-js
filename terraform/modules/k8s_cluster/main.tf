@@ -9,11 +9,27 @@ terraform {
   }
 }
 
+variable "do_token" {}
+variable "pvt_key" {}
+# variable "ssh_key_name" {}
+# variable "NOTION_API_KEY" {}
+# variable "TELEGRAM_BOT_TOKEN" {}
+# variable "NOTION_DATABASE_ID" {}
+# variable "DATABASE_URL" {}
+
+provider "digitalocean" {
+  token = var.do_token
+}
+
+data "digitalocean_ssh_key" "terraform" {
+  name = "terraform"
+}
+
 resource "digitalocean_kubernetes_cluster" "bot-cluster" {
   name   = "bot-cluster"
   region = "ams3"
   # Grab the latest version slug from `doctl kubernetes options versions`
-  version = "1.24.4-do.0"
+  version = "1.25.4-do.0"
 
   node_pool {
     name       = "worker-pool"
@@ -27,10 +43,7 @@ resource "digitalocean_kubernetes_cluster" "bot-cluster" {
     }
   }
 
-  # ssh_keys = [
-  #     data.digitalocean_ssh_key.terraform.id
-  # ] 
-  provider = digitalocean.env1
+  provider = digitalocean
 
   connection {
     host        = self.ipv4_address

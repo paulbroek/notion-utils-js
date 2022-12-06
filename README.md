@@ -67,17 +67,42 @@ docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d pos
 ~/.yarn/bin/dotenv -e .env.test -- bash scripts/deploy-minikube.sh
 ```
 
-## 1.2 Deploy infrastructure
+## 1.2 Plan and deploy infrastructure
+
+Always export `DO_PAT` first:
 
 ```bash
-cd ~/repos/notion-utils-js/terraform
+export DO_PAT=...
+```
+
+Plan infrastructure:
+
+```bash
+cd ~/repos/notion-utils-js/terraform/env/k8s_test
+terraform plan -out="terraform.tfplan" \
+    -var "do_token=${DO_PAT}" \
+    -var "pvt_key=$HOME/.ssh/id_rsa" \
+    -var-file="../../secrets/secret.tfvars"
+```
+
+Apply infrastructure:
+
+```bash
+cd ~/repos/notion-utils-js/terraform/env/k8s_test
 terraform apply -auto-approve \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
-    -var-file="vars/test.tfvars"
+    -var-file="../../secrets/secret.tfvars"
 ```
 
-assuming a file `~/repos/notion-utils-js/terraform/vars/test.tfvars`:
+or, if planned before:
+
+```bash
+cd ~/repos/notion-utils-js/terraform
+terraform -chdir="./env/k8s_test" apply "terraform.tfplan"
+```
+
+assuming a file `~/repos/notion-utils-js/terraform/env/k8s_test/secret.tfvars`:
 
 ```vim
 # do_token="..."

@@ -7,6 +7,10 @@
 variable "do_token" {}
 variable "pvt_key" {}
 # variable "ssh_key_name" {}
+variable "NOTION_API_KEY" {}
+variable "TELEGRAM_BOT_TOKEN" {}
+variable "NOTION_DATABASE_ID" {}
+variable "DATABASE_URL" {}
 
 terraform {
   required_version = ">= 1.0.0, < 2.0.0"
@@ -53,21 +57,21 @@ resource "digitalocean_droplet" "notion-telegram-bot" {
     timeout     = "3m"
   }
 
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "export PATH=$PATH:/usr/bin",
-  #     # clone and deploy
-  #     "git clone -b dev https://github.com/paulbroek/notion-utils-js",
-  #     # TODO: use `~/.yarn/bin/dotenv -e .env make sync_env_to_here` instead
-  #     "touch /root/notion-utils-js/.env",
-  #     "touch /root/notion-utils-js/.env.test",
-  #     "echo \"NOTION_API_KEY=${var.NOTION_API_KEY}\" >> /root/notion-utils-js/.env.test",
-  #     "echo \"TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> /root/notion-utils-js/.env.test",
-  #     "echo \"NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> /root/notion-utils-js/.env.test",
-  #     "echo \"DATABASE_URL=${var.DATABASE_URL}\" >> /root/notion-utils-js/.env.test",
-  #     "docker compose -f /root/notion-utils-js/docker-compose.test.yml up -d telegram-bot"
-  #   ]
-  # }
+  provisioner "remote-exec" {
+    inline = [
+      "export PATH=$PATH:/usr/bin",
+      # clone and deploy
+      "git clone -b dev https://github.com/paulbroek/notion-utils-js",
+      # TODO: use `~/.yarn/bin/dotenv -e .env make sync_env_to_here` instead
+      "touch /root/notion-utils-js/.env",
+      "touch /root/notion-utils-js/.env.test",
+      "echo \"NOTION_API_KEY=${var.NOTION_API_KEY}\" >> /root/notion-utils-js/.env.test",
+      "echo \"TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> /root/notion-utils-js/.env.test",
+      "echo \"NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> /root/notion-utils-js/.env.test",
+      "echo \"DATABASE_URL=${var.DATABASE_URL}\" >> /root/notion-utils-js/.env.test",
+      "docker compose -f /root/notion-utils-js/docker-compose.test.yml up -d telegram-bot"
+    ]
+  }
 
   # provisioner "remote-exec" {
   #     scripts = [
