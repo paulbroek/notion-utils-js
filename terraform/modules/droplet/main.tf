@@ -4,9 +4,9 @@
 #   regions = ["ams3"]
 # }
 
-# provider "digitalocean" {
-#   config_file = "../provider.tf"
-# }
+variable "do_token" {}
+variable "pvt_key" {}
+# variable "ssh_key_name" {}
 
 terraform {
   required_version = ">= 1.0.0, < 2.0.0"
@@ -19,16 +19,31 @@ terraform {
   }
 }
 
-resource "droplet" "notion-telegram-bot" {
+provider "digitalocean" {
+  # config_file = "../modules/base/provider.tf"
+  token = var.do_token
+}
+
+data "digitalocean_ssh_key" "terraform" {
+  name = "terraform"
+  # name = var.ssh_key_name
+
+  # provider = digitalocean
+}
+
+resource "digitalocean_droplet" "notion-telegram-bot" {
   image = "docker-20-04"
   # image = digitalocean_custom_image.ubuntu_with_docker.id
   name   = "notion-telegram-bot"
   region = "ams3"
   size   = "s-1vcpu-1gb"
+
   ssh_keys = [
     data.digitalocean_ssh_key.terraform.id
   ]
-  provider = digitalocean.env1
+
+  # provider = digitalocean.env1
+  provider = digitalocean
 
   connection {
     host        = self.ipv4_address
@@ -38,21 +53,21 @@ resource "droplet" "notion-telegram-bot" {
     timeout     = "3m"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "export PATH=$PATH:/usr/bin",
-      # clone and deploy
-      "git clone -b dev https://github.com/paulbroek/notion-utils-js",
-      # TODO: use `~/.yarn/bin/dotenv -e .env make sync_env_to_here` instead
-      "touch /root/notion-utils-js/.env",
-      "touch /root/notion-utils-js/.env.test",
-      "echo \"NOTION_API_KEY=${var.NOTION_API_KEY}\" >> /root/notion-utils-js/.env.test",
-      "echo \"TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> /root/notion-utils-js/.env.test",
-      "echo \"NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> /root/notion-utils-js/.env.test",
-      "echo \"DATABASE_URL=${var.DATABASE_URL}\" >> /root/notion-utils-js/.env.test",
-      "docker compose -f /root/notion-utils-js/docker-compose.test.yml up -d telegram-bot"
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "export PATH=$PATH:/usr/bin",
+  #     # clone and deploy
+  #     "git clone -b dev https://github.com/paulbroek/notion-utils-js",
+  #     # TODO: use `~/.yarn/bin/dotenv -e .env make sync_env_to_here` instead
+  #     "touch /root/notion-utils-js/.env",
+  #     "touch /root/notion-utils-js/.env.test",
+  #     "echo \"NOTION_API_KEY=${var.NOTION_API_KEY}\" >> /root/notion-utils-js/.env.test",
+  #     "echo \"TELEGRAM_BOT_TOKEN=${var.TELEGRAM_BOT_TOKEN}\" >> /root/notion-utils-js/.env.test",
+  #     "echo \"NOTION_DATABASE_ID=${var.NOTION_DATABASE_ID}\" >> /root/notion-utils-js/.env.test",
+  #     "echo \"DATABASE_URL=${var.DATABASE_URL}\" >> /root/notion-utils-js/.env.test",
+  #     "docker compose -f /root/notion-utils-js/docker-compose.test.yml up -d telegram-bot"
+  #   ]
+  # }
 
   # provisioner "remote-exec" {
   #     scripts = [
