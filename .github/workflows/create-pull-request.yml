@@ -29,12 +29,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: auto merge pull request
-      #   run: |
-      #     # get last pull-request id
-      #     prId =
-      #     # disable line below to merge manually
-      #     # auto-merging pull-request
-      #     gh pr merge $prId --auto -m
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: auto merge pull request
+        run: |
+          # get last pull-request id
+          prId=$(gh pr list | awk '{print $1}')
+          # disable line below to merge manually
+          # auto-merging pull-request
+          gh pr merge $prId --auto -m
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
