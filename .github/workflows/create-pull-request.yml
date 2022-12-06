@@ -13,15 +13,15 @@ jobs:
         run: |
           gh label create -f ready-to-merge
           gh pr create -B main -H test -l ready-to-merge --title 'Merge test into main' --body 'Created by Github action'
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # disable this workflow to merge pr manually
       - name: auto merge pull request
         run: |
           # get last pull-request id
           prId=$(gh pr list | awk '{print $1}')
-          # disable line below to merge manually
-          # auto-merging pull-request
+          # auto-merge pull-request
           gh pr merge $prId --auto -m
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
