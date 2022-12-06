@@ -147,7 +147,9 @@ const bookExistsInTable = async (props: Props): Promise<Boolean> => {
       and: [{ property: "Goodreads URL", url: { equals: props.goodreadsUrl } }],
     },
   });
-  return response.results.length ? true : false;
+  const resLen = response.results.length;
+  console.log("resLen: ", resLen);
+  return resLen ? true : false;
 };
 
 const addSummaryToTable = async (
