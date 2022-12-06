@@ -42,7 +42,6 @@ docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d --b
 docker-compose -f docker-compose.test.yml logs -f
 
 # for fast debugging and development
-# export DATABASE_URL="postgresql://POSTGRES_USER:POSTGRES_PASS@localhost:5432/notion-telegram?schema=public" && yarn dev
 ~/.yarn/bin/dotenv -e .env.test -- yarn dev
 ```
 
@@ -63,20 +62,20 @@ docker-compose -f docker-compose.test.yml --env-file dbcredentials.env up -d pos
 
 ```bash
 # kubectl create deployment notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js
-kubectl run notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js --image-pull-policy=Never
+# not working?
+# kubectl run notion-utils-js --image=ghcr.io/paulbroek/notion-utils-js --image-pull-policy=Never
+~/.yarn/bin/dotenv -e .env.test -- bash scripts/deploy-minikube.sh
 ```
 
-## 1.2 Deploy infrastructure
+## 1.2 Plan and deploy infrastructure
+
+Always export `DO_PAT` first:
 
 ```bash
-cd ~/repos/notion-utils-js/infra
-terraform apply -auto-approve \
-    -var "do_token=${DO_PAT}" \
-    -var "pvt_key=$HOME/.ssh/id_rsa" \
-    -var-file="secret.tfvars"
+export DO_PAT=...
 ```
 
-assuming a file `~/repos/notion-utils-js/infra/secret.tfvars`:
+and assuming a file `~/repos/notion-utils-js/terraform/env/k8s_test/secret.tfvars`:
 
 ```vim
 # do_token="..."
@@ -84,16 +83,45 @@ assuming a file `~/repos/notion-utils-js/infra/secret.tfvars`:
 NOTION_API_KEY="..."
 TELEGRAM_BOT_TOKEN="..."
 NOTION_DATABASE_ID="..."
+DATABASE_URL="..."
+```
+
+Initialize and plan infrastructure:
+
+```bash
+cd ~/repos/notion-utils-js/terraform/env/k8s_test
+terraform init
+terraform plan -out="terraform.tfplan" \
+    -var "do_token=${DO_PAT}" \
+    -var "pvt_key=$HOME/.ssh/id_rsa" \
+    -var-file="../../secrets/secret.tfvars"
+```
+
+Apply infrastructure:
+
+```bash
+cd ~/repos/notion-utils-js/terraform/env/k8s_test
+terraform apply -auto-approve \
+    -var "do_token=${DO_PAT}" \
+    -var "pvt_key=$HOME/.ssh/id_rsa" \
+    -var-file="../../secrets/secret.tfvars"
+```
+
+or, if planned before:
+
+```bash
+cd ~/repos/notion-utils-js/terraform
+terraform -chdir="./env/k8s_test" apply "terraform.tfplan"
 ```
 
 ## 1.3 Destroy infrastructure
 
 ```bash
-cd ~/repos/notion-utils-js/infra
+cd ~/repos/notion-utils-js/terraform/env/k8s_test
 terraform destroy -auto-approve \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
-    -var-file="secret.tfvars"
+    -var-file="../../secrets/secret.tfvars"
 ```
 
 ## 2.0 Testing

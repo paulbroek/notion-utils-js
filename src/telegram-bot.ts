@@ -18,7 +18,6 @@ import {
   deleteSummaryById,
 } from ".";
 import botCommands from "./bot-commands.json";
-import { PrismaClient } from "@prisma/client";
 
 // never save state here!
 // let databaseId: string;
@@ -26,7 +25,6 @@ const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
 
-const prisma = new PrismaClient();
 const NOT_IMPLEMENTED = "command not implemented yet";
 
 // TODO: turn into decorator that checks condition
@@ -139,6 +137,18 @@ bot.command("set_database_id", async (ctx) => {
   await updateUserSettings(ctx.from.id, { databaseId: databaseId });
 
   ctx.reply("databaseId was set to: \n" + databaseId);
+});
+
+bot.command("reset_database_id", async (ctx) => {
+  const newDatabaseId = null;
+  await updateUserSettings(ctx.from.id, { databaseId: newDatabaseId });
+
+  ctx.reply("databaseId was set to: \n" + newDatabaseId);
+});
+
+bot.command("nrow", async () => {
+  // TODO: implement method
+  // get number of rows in database
 });
 
 bot.command("repeat_last", async (ctx) => {

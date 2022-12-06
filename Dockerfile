@@ -7,6 +7,8 @@ COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 
 RUN npm install -g npm@9.1.3
 RUN npm install husky -g
+# install ts-node for easy pod debugging
+RUN npm install -g ts-node
 RUN npm install --production --silent && mv node_modules ../
 
 # Install Google Chrome Stable and fonts
@@ -23,9 +25,7 @@ COPY . .
 RUN npm run build
 
 # generate prisma client
-RUN npx prisma generate
-
-# install ts-node for easy pod debugging
-RUN npm install -g ts-node
+# RUN npx prisma generate
+RUN yarn prisma generate
 
 USER node
