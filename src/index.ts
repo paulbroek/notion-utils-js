@@ -57,6 +57,7 @@ const deleteSummaryById = async (
     allowOnlyNonEdited &&
     lastSummaryPage["created_time"] != lastSummaryPage["last_edited_time"]
   ) {
+    // TODO: tell user when it was last edited using timeAgo
     const msg = "cannot delete, since page was manually edited";
     console.error(msg);
     return msg;

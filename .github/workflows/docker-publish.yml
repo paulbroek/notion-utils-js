@@ -14,7 +14,7 @@ on:
   # pull_request:
   #   branches: ["main"]
 
-  # to allow manual runs
+  # for manual runs
   workflow_dispatch:
     inputs:
       branch:
