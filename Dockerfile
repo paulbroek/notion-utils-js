@@ -25,7 +25,7 @@ COPY . .
 RUN npm run build
 
 # generate prisma client
-# RUN npx prisma generate
-RUN yarn prisma generate
+RUN npx prisma generate
+# RUN yarn prisma generate
 
 USER node
