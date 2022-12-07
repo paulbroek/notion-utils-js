@@ -5,3 +5,4 @@
 # prettier --write
 # tsc -p .
 npx lint-staged
+yarn lint-staged

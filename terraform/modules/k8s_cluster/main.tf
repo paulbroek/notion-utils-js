@@ -32,15 +32,17 @@ resource "digitalocean_kubernetes_cluster" "bot-cluster" {
   version = "1.25.4-do.0"
 
   node_pool {
-    name       = "worker-pool"
+    name = "worker-pool"
+    # Grab instance types with `doctl compute size list`
     size       = "s-2vcpu-2gb"
+    auto_scale = false
     node_count = 2
 
-    taint {
-      key    = "workloadKind"
-      value  = "database"
-      effect = "NoSchedule"
-    }
+    # taint {
+    #   key    = "workloadKind"
+    #   value  = "database"
+    #   effect = "NoSchedule"
+    # }
   }
 
   provider = digitalocean

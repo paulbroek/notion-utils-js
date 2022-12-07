@@ -73,6 +73,8 @@ Always export `DO_PAT` first:
 
 ```bash
 export DO_PAT=...
+export SPACES_ACCESS_TOKEN=...
+export SPACES_SECRET_KEY=...
 ```
 
 and assuming a file `~/repos/notion-utils-js/terraform/env/k8s_test/secret.tfvars`:
@@ -90,7 +92,11 @@ Initialize and plan infrastructure:
 
 ```bash
 cd ~/repos/notion-utils-js/terraform/env/k8s_test
-terraform init
+
+terraform init \
+    -backend-config="access_key=$SPACES_ACCESS_TOKEN" \
+    -backend-config="secret_key=$SPACES_SECRET_KEY"
+
 terraform plan -out="terraform.tfplan" \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=$HOME/.ssh/id_rsa" \
