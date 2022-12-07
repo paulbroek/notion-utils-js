@@ -31,8 +31,8 @@ env:
 
 jobs:
   build:
-    # if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
-    if: github.event.pull_request.merged == true
+    if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
