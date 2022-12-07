@@ -12,7 +12,7 @@ on:
     # tags: ["v*.*.*"]
 
   pull_request:
-    branches: ["main", "test"]
+    branches: ["main"]
     types: [closed]
 
   # for manual runs
