@@ -16,11 +16,11 @@ on:
 
   # for manual runs
   workflow_dispatch:
-    # inputs:
-    #   branch:
-    #     description: "The branch to run the workflow for"
-    #     required: true
-    #     default: "main"
+    inputs:
+      branch:
+        description: "The branch to run the workflow for"
+        required: true
+        default: "main"
 
 env:
   # Use docker.io for Docker Hub if empty
