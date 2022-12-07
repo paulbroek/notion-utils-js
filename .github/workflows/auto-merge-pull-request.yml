@@ -2,7 +2,7 @@ name: Auto merge pull request
 
 on:
   pull_request:
-    branches: ["test"]
+    branches: ["test", "main"]
     types: [opened]
 
 jobs:
