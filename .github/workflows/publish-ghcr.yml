@@ -6,10 +6,10 @@ name: Publish ghcr
 # documentation.
 
 on:
-  push:
-    branches: ["main"]
-    # Publish semver tags as releases.
-    # tags: ["v*.*.*"]
+  # push:
+  #   branches: ["main"]
+  #   # Publish semver tags as releases.
+  #   # tags: ["v*.*.*"]
 
   # TODO: disabled for now, DO only supports Docker hub for auto app deployments
   # pull_request:
