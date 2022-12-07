@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.0.0, < 2.0.0"
+
+  backend "s3" {
+    endpoint = "ams3.digitaloceanspaces.com/"
+    region   = "us-west-1" # not used since it's a DigitalOcean spaces bucket
+    key      = "terraform.tfstate"
+    bucket   = "kube-terraform-state-notion-utils"
+
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+  }
+}
+
 module "k8s_cluster" {
   source = "../../modules/k8s_cluster"
 

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: notion-telegram-bot-js
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: notion-telegram-bot-js
