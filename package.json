@@ -33,7 +33,7 @@
   "homepage": "https://github.com/paulbroek/notion-utils-js#readme",
   "dependencies": {
     "@notionhq/client": "^2.2.1",
-    "@prisma/client": "^4.7.0",
+    "@prisma/client": "^4.7.1",
     "@types/jest": "^29.2.3",
     "@types/puppeteer": "^5.4.7",
     "dotenv": "^16.0.3",
