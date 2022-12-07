@@ -37,12 +37,6 @@ resource "digitalocean_kubernetes_cluster" "bot-cluster" {
     size       = "s-2vcpu-2gb"
     auto_scale = false
     node_count = 2
-
-    # taint {
-    #   key    = "workloadKind"
-    #   value  = "database"
-    #   effect = "NoSchedule"
-    # }
   }
 
   provider = digitalocean
