@@ -36,7 +36,8 @@ resource "digitalocean_kubernetes_cluster" "bot-cluster" {
     # Grab instance types with `doctl compute size list`
     size       = "s-2vcpu-2gb"
     auto_scale = false
-    node_count = 2
+    # TODO: use variable
+    node_count = 1
   }
 
   provider = digitalocean

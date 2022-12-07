@@ -4,10 +4,12 @@ import { Message } from "typegram";
 import { PrismaClient } from "@prisma/client";
 import input from "input";
 
-const prisma = new PrismaClient();
-
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
 const apiHash: string = process.env.TELEGRAM_API_HASH as string;
+
+console.error("process.env.TELEGRAM_API_HASH: ", apiHash);
+console.error("process.env.DATABASE_URL: ", process.env.DATABASE_URL);
+const prisma = new PrismaClient();
 
 const createTelegramClient = (sessionKey: string) => {
   // when `sessionKey` is empty, automatically asks for user input
