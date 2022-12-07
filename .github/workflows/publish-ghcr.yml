@@ -11,9 +11,10 @@ on:
     # Publish semver tags as releases.
     # tags: ["v*.*.*"]
 
-  pull_request:
-    branches: ["main"]
-    types: [closed]
+  # TODO: disabled for now, DO only supports Docker hub for auto app deployments
+  # pull_request:
+  #   branches: ["main"]
+  #   types: [closed]
 
   # for manual runs
   workflow_dispatch:
@@ -31,9 +32,9 @@ env:
 
 jobs:
   build:
-    # if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
+    if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
     # if: github.event.pull_request.merged == true
-    if: false
+    # if: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
