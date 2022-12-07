@@ -23,7 +23,8 @@ spec:
               cpu: 100m
               memory: 328Mi
 
-          command: ["node", "./dist/telegram-bot.js"]
+          # command: ["node", "./dist/telegram-bot.js"]
+
           # command:
           #   - /bin/sh
           #   - -c

@@ -12,7 +12,7 @@ services:
       NODE_ENV: production
     env_file:
       - .env
-    command: ["node", "./dist/telegram-bot.js"]
+    # command: ["node", "./dist/telegram-bot.js"]
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
