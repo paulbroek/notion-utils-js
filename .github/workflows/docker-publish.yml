@@ -11,8 +11,9 @@ on:
     # Publish semver tags as releases.
     # tags: ["v*.*.*"]
 
-  # pull_request:
-  #   branches: ["main"]
+  pull_request:
+    branches: ["main"]
+    types: [closed]
 
   # for manual runs
   workflow_dispatch:
@@ -30,6 +31,7 @@ env:
 
 jobs:
   build:
+    if: (!(github.event.action == 'closed' && github.event.pull_request.merged != true))
     runs-on: ubuntu-latest
     permissions:
       contents: read
