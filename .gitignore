@@ -23,6 +23,11 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Scrape results
 scrapeItem.json
 
+# Digital Ocean App configuration
+app-spec.yaml
+app-spec.json
+app-spec-updated.json
+
 # Runtime data
 pids
 *.pid
