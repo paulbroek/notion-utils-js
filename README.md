@@ -14,6 +14,7 @@ TELEGRAM_BOT_TOKEN=...
 NOTION_DATABASE_ID=...
 SERVER_USER=...
 SERVER_ADDR=...
+DATABASE_URL=...
 ```
 
 And `./config/.env.test` containing
@@ -32,6 +33,8 @@ After following instructions [here](https://github.com/gram-js/gramjs)
 ```bash
 # syncing .env.test file, update .env first with server details
 ~/.yarn/bin/dotenv -e .env make sync_env_to_server
+# sync to here
+~/.yarn/bin/dotenv -e .env make sync_env_to_here
 
 docker-compose -f docker-compose.test.yml up -d telegram-bot --build
 # rm and rerun in one line
