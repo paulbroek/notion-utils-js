@@ -19,8 +19,6 @@ import {
 } from ".";
 import botCommands from "./bot-commands.json";
 
-// never save state here!
-// let databaseId: string;
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
@@ -55,13 +53,6 @@ bot.help((ctx) => {
   console.log("summary: \n\n" + summary);
   ctx.reply("commands summary: \n\n" + summary);
 });
-
-// bot.command("quit", (ctx) => {
-//   // Explicit usage
-//   ctx.telegram.leaveChat(ctx.message.chat.id);
-//   // Context shortcut
-//   ctx.leaveChat();
-// });
 
 const scrapeAndReply = async (ctx: Context, msg: string) => {
   // check if databaseId is set

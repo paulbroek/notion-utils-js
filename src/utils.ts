@@ -8,19 +8,14 @@ const periodicallyDoTillCondition = async (
   callback_params: object,
   condition: boolean = true
 ): Promise<Boolean> => {
-  // try {
   while (true) {
     const res = await async_callback(callback_params);
     if (res == condition) {
       console.log("meets condition!");
       return true;
-      // break;
     }
     await delay(every);
   }
-  // } finally {
-  //   return false;
-  // }
   return false;
 };
 
