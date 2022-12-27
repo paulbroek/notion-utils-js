@@ -200,21 +200,9 @@ bot.command("add", async (ctx) => {
 //   // ctx.reply(msg);
 // });
 
-// bot.command("db", async (ctx) => {
-//   const res = await prisma.user.findMany();
-//   console.log("db res: ", JSON.stringify(res));
-// });
-
 bot.command("bot_version", async (ctx) => {
-  // const botVersion = "1.0.1";
-  // const botVersion = process.env.npm_package_version;
   ctx.reply(`version of bot running: ${version}`);
 });
-
-// bot.command("commands", async (ctx) => {
-//   const summary = createBotCommandsSummary(botCommands);
-//   console.log("summary: \n\n" + summary);
-// });
 
 bot.launch();
 
