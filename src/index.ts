@@ -1,11 +1,9 @@
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
-// import { WatchDirectoryFlags } from "typescript";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 // const pageId = process.env.NOTION_PAGE_ID as string;
-// const databaseId = process.env.NOTION_DATABASE_ID as string;
 // console.log("pageId: ", pageId);
 
 // dummy method to verify if any data can be pulled from Notion API
@@ -88,18 +86,15 @@ const deleteLastSummary = async (
     page_size: 1,
   });
 
-  // console.log("res len: " + response.results.length);
   if (response.results.length == 0) {
     console.error("no results in table");
     return;
   }
   const lastSummaryPage = response.results[0];
   const lastSummaryId = lastSummaryPage.id;
-  // const lastSummaryUrl = lastSummaryPage["url"];
   const lastSummaryTitle =
     lastSummaryPage["properties"]["Title"].title[0].text.content;
   console.log("lastSummaryId: " + lastSummaryId);
-  // console.log("lastSummaryUrl: " + lastSummaryUrl);
   console.log("lastSummaryTitle: " + lastSummaryTitle);
   console.log(lastSummaryPage);
 
@@ -115,7 +110,6 @@ const deleteLastSummary = async (
 
   try {
     await deletePage(lastSummaryId);
-    // return lastSummaryId;
     return lastSummaryTitle;
   } catch (error) {
     console.error(error);
@@ -216,39 +210,6 @@ const addSummaryToTable = async (
       //   ],
       // },
     },
-    // the actual summary..
-    // children: [
-    //   {
-    //     object: "block",
-    //     heading_2: {
-    //       rich_text: [
-    //         {
-    //           text: {
-    //             content: "Lacinato kale",
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   },
-    //   {
-    //     object: "block",
-    //     paragraph: {
-    //       rich_text: [
-    //         {
-    //           text: {
-    //             content:
-    //               "Lacinato kale is a variety of kale with a long tradition in Italian cuisine, especially that of Tuscany. It is also known as Tuscan kale, Italian kale, dinosaur kale, kale, flat back kale, palm tree kale, or black Tuscan palm.",
-    //             link: {
-    //               url: "https://en.wikipedia.org/wiki/Lacinato_kale",
-    //             },
-    //           },
-    //           // href: "https://en.wikipedia.org/wiki/Lacinato_kale",
-    //         },
-    //       ],
-    //       color: "default",
-    //     },
-    //   },
-    // ],
   });
 
   console.log(response);
