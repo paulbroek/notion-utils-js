@@ -8,6 +8,7 @@ const fs = require("fs");
 
 const prisma = new PrismaClient();
 const ENABLE_JSON_DUMP = false;
+// const ENABLE_JSON_DUMP = true;
 
 // const extractNumberFromString = (str: string): null | number => {
 //   const matches = str.match(/\d+/);
@@ -59,9 +60,37 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   const page = await browser.newPage();
 
   try {
-    await page.goto(url, {
+    const res = await page.goto(url, {
       waitUntil: "domcontentloaded",
     });
+    // wait until all elements loaded?
+    // await page.waitForSelector("#bookAuthors", {
+    //   visible: true,
+    // });
+    // await page.waitForSelector("#bookAuthors");
+    // await page.waitForSelector(".authorName", { visible: true });
+    // await page.waitForFunction(
+    //   (selector) => !!document.querySelector(selector),
+    //   {},
+    //   ".authorName"
+    // );
+    // dump to .html when `ENABLE_JSON_DUMP` is enabled
+    if (res != null) {
+      const htmlDump = await res.text();
+      // console.log(htmlDump);
+      if (ENABLE_JSON_DUMP) {
+        fs.writeFile(
+          "/tmp/bookItem.html",
+          // JSON.stringify(htmlDump),
+          htmlDump,
+          "utf8",
+          function (err) {
+            if (err) throw err;
+            console.log("complete");
+          }
+        );
+      }
+    }
   } catch (error) {
     console.error(`cannot visit url: ${url}. error: ${error}`);
     return null;
@@ -97,14 +126,24 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     // const authorUrl = (document.querySelector(".authorUrl") as HTMLElement)
     //   .innerText;
     const authorUrl = "nothing";
+    // const authorUrl = (
+    //   document.querySelector(".authorName > a") as HTMLAnchorElement
+    // )?.href;
+    console.log("authorUrl: ", authorUrl);
     // .getAttribute("href");
     const isbnElement = document.querySelector(
       "#bookDataBox > div.clearFloats > div.infoBoxRowItem"
     ) as HTMLElement;
     const isbn = isbnElement ? isbnElement.innerText : "";
-    const published = "";
     // TODO: scrape `published`
+    // const published = (
+    //   document.querySelector(
+    //     "#details .row .dateFormat:nth-child(2)"
+    //   ) as HTMLElement
+    // ).innerText;
+    const published = "";
     // const published = (document.querySelector("#details") as HTMLElement).innerText;
+    console.log("published: ", published);
     const res: bookScrapeItem = {
       title,
       author,
