@@ -69,11 +69,11 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
     // });
     // await page.waitForSelector("#bookAuthors");
     // await page.waitForSelector(".authorName", { visible: true });
-    await page.waitForFunction(
-      (selector) => !!document.querySelector(selector),
-      {},
-      ".authorName"
-    );
+    // await page.waitForFunction(
+    //   (selector) => !!document.querySelector(selector),
+    //   {},
+    //   ".authorName"
+    // );
     // dump to .html when `ENABLE_JSON_DUMP` is enabled
     if (res != null) {
       const htmlDump = await res.text();
