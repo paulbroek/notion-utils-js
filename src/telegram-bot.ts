@@ -139,7 +139,7 @@ bot.command("reset_database_id", async (ctx) => {
 
 bot.command("nrow", async () => {
   // TODO: implement method
-  // get number of rows in database
+  // get number of rows in notion database
 });
 
 bot.command("repeat_last", async (ctx) => {
