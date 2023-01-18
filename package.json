@@ -36,6 +36,7 @@
     "@prisma/client": "^4.7.1",
     "@types/jest": "^29.2.3",
     "@types/puppeteer": "^5.4.7",
+    "axios": "^1.2.3",
     "dotenv": "^16.0.3",
     "input": "^1.0.1",
     "project-version": "^2.0.0",

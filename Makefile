@@ -1,11 +1,13 @@
+ENV_FILE=./.env.test
+
 .PHONY: install
 install:
 	yarn install
 	
-## Run tests with jest
 .PHONY: test
 test:
-	yarn run test
+	~/.yarn/bin/dotenv -e $(ENV_FILE) -- yarn jest __tests__/telegram.ts --force-exit --runInBand
+	# yarn run test
 
 .PHONY: bot
 bot:
