@@ -14,6 +14,11 @@ const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
 const apiHash: string = process.env.TELEGRAM_API_HASH as string;
 const API_HOST: string = process.env.API_HOST as string;
 const API_PORT: string = process.env.API_PORT as string;
+// TODO: support multiple prefixes (youtube?)
+const GOODREADS_PFX: string = "https://www.goodreads.com/book/show/";
+const YOUTUBE_PFX: string = "https://www.goodreads.com/book/show/";
+const PODCHASER_PFX: string =
+  "https://www.podchaser.com/podcasts/the-hockey-pdocast-7381/episodes/from-the-archives-with-rikard-159851742";
 
 console.error("process.env.TELEGRAM_API_HASH: ", apiHash);
 console.error("process.env.DATABASE_URL: ", process.env.DATABASE_URL);
@@ -77,7 +82,7 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   }
 
   // check if msg is valid URL or ask user
-  if (!msg.startsWith("https://www.goodreads.com/book/show/")) {
+  if (!msg.startsWith(GOODREADS_PFX)) {
     ctx.reply("please pass valid goodreads book URL");
     return;
   }
@@ -118,6 +123,24 @@ const scrapeAndReply = async (ctx: Context, msg: string) => {
   }
 };
 
+// const validUrl = (url: string) => {
+//   switch (url) {
+//     case (url.startsWith("")): {
+//       //statements;
+//       break;
+//     }
+//     case constant_expression2: {
+//       //statements;
+//       break;
+//     }
+//     default: {
+//       //statements;
+//       break;
+//     }
+//   }
+// };
+
+// TODO: will be a generic method that posts url of any type, picking the right endpoint to call
 const postUrlAndReply = async (urlOrId: string): Promise<string> => {
   const endpoint: string = "scrape/goodreads";
   const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}/?url=${urlOrId}`;

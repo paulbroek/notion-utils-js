@@ -134,6 +134,20 @@ interface Props {
   goodreadsUrl: string;
   databaseId: string;
 }
+
+// TODO: will become a generic method that can check if any item exists in any table
+const itemExistsInTable = async (props: Props): Promise<Boolean> => {
+  const response = await notion.databases.query({
+    database_id: props.databaseId,
+    filter: {
+      and: [{ property: "Goodreads URL", url: { equals: props.goodreadsUrl } }],
+    },
+  });
+  const resLen = response.results.length;
+  console.log("resLen: ", resLen);
+  return resLen ? true : false;
+};
+
 const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   const response = await notion.databases.query({
     database_id: props.databaseId,
