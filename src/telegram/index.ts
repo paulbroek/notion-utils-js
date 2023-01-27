@@ -9,16 +9,13 @@ import { addSummaryToTable, bookExistsInTable } from "../";
 import scrapeBookRetry from "../scrape";
 import { bookScrapeItem } from "../models/bookScrapeItem";
 import axios from "axios";
+import { DataCollections } from "../enums";
+import { COLLECTIONS } from "../types";
 
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
 const apiHash: string = process.env.TELEGRAM_API_HASH as string;
 const API_HOST: string = process.env.API_HOST as string;
 const API_PORT: string = process.env.API_PORT as string;
-// TODO: support multiple prefixes (youtube?)
-const GOODREADS_PFX: string = "https://www.goodreads.com/book/show/";
-const YOUTUBE_PFX: string = "https://www.goodreads.com/book/show/";
-const PODCHASER_PFX: string =
-  "https://www.podchaser.com/podcasts/the-hockey-pdocast-7381/episodes/from-the-archives-with-rikard-159851742";
 
 console.error("process.env.TELEGRAM_API_HASH: ", apiHash);
 console.error("process.env.DATABASE_URL: ", process.env.DATABASE_URL);
@@ -74,78 +71,101 @@ const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
 
   return userSettings.databaseId;
 };
-const scrapeAndReply = async (ctx: Context, msg: string) => {
-  // check if databaseId is set
-  const databaseId = await getAndWarnDatabaseId(ctx);
-  if (databaseId == null) {
-    return;
-  }
+// const scrapeAndReply = async (ctx: Context, msg: string) => {
+//   // check if databaseId is set
+//   const databaseId = await getAndWarnDatabaseId(ctx);
+//   if (databaseId == null) {
+//     return;
+//   }
 
-  // check if msg is valid URL or ask user
-  if (!msg.startsWith(GOODREADS_PFX)) {
-    ctx.reply("please pass valid goodreads book URL");
-    return;
-  }
-  // throw away any url encoded queries
-  const goodreadsUrl: string = msg.split("?")[0];
+//   // check if msg is valid URL or ask user
+//   if (!msg.startsWith(Prefix.GOODREADS)) {
+//     ctx.reply("please pass valid goodreads book URL");
+//     return;
+//   }
+//   // throw away any url encoded queries
+//   const goodreadsUrl: string = msg.split("?")[0];
 
-  if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
-    ctx.reply("Book already exists in summary database");
-    return;
-  }
+//   if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
+//     ctx.reply("Book already exists in summary database");
+//     return;
+//   }
 
-  // user feedback, send message when starting scrape process, delete it when finished / error
-  const { message_id } = await ctx.reply("scraping..");
+//   // user feedback, send message when starting scrape process, delete it when finished / error
+//   const { message_id } = await ctx.reply("scraping..");
 
-  const scrapeRes: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
-  // ctx.reply(`res: ${JSON.stringify(res)}`);
-  await ctx.deleteMessage(message_id);
+//   const scrapeRes: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
+//   // ctx.reply(`res: ${JSON.stringify(res)}`);
+//   await ctx.deleteMessage(message_id);
 
-  // create notion page, ask user first
-  if (scrapeRes) {
-    const addResult = await addSummaryToTable(scrapeRes, databaseId);
+//   // create notion page, ask user first
+//   if (scrapeRes) {
+//     const addResult = await addSummaryToTable(scrapeRes, databaseId);
 
-    if (!addResult) {
-      ctx.reply("could not add result to Notion");
-      // TODO: retry automatically?
-    } else {
-      // console.log("addResult: ", JSON.stringify(addResult));
-      // FIXME: very ugly method, but notion API does not allow to see properties of response directly
-      // See: https://github.com/makenotion/notion-sdk-js/issues/247
+//     if (!addResult) {
+//       ctx.reply("could not add result to Notion");
+//       // TODO: retry automatically?
+//     } else {
+//       // console.log("addResult: ", JSON.stringify(addResult));
+//       // FIXME: very ugly method, but notion API does not allow to see properties of response directly
+//       // See: https://github.com/makenotion/notion-sdk-js/issues/247
 
-      // const recreatedObject = JSON.parse(JSON.stringify(addResult));
-      // console.log("addResult.reparsed: ", recreatedObject.url);
-      // ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
-      ctx.reply(`Done! Visit the summary at: \n${addResult["url"]}`);
-    }
-  } else {
-    ctx.reply("Could not scrape Goodreads page");
-  }
-};
-
-// const validUrl = (url: string) => {
-//   switch (url) {
-//     case (url.startsWith("")): {
-//       //statements;
-//       break;
+//       // const recreatedObject = JSON.parse(JSON.stringify(addResult));
+//       // console.log("addResult.reparsed: ", recreatedObject.url);
+//       // ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
+//       ctx.reply(`Done! Visit the summary at: \n${addResult["url"]}`);
 //     }
-//     case constant_expression2: {
-//       //statements;
-//       break;
-//     }
-//     default: {
-//       //statements;
-//       break;
-//     }
+//   } else {
+//     ctx.reply("Could not scrape Goodreads page");
 //   }
 // };
 
+// function getKeyFromUrl(url: string): DataCollections | null {
+// function getKeyFromUrl(url: string) {
+//   const match = Object.entries(COLLECTIONS).find(([key, collection]) =>
+//     url.startsWith(collection.PFX)
+//   );
+//   // as [keyof typeof DataCollections, Collection];
+
+//   // return match ? (match[0] as DataCollections) : null;
+//   return match ? match[0] : null;
+// }
+
+function getKeyFromUrl(url: string) {
+  const match = Object.entries(COLLECTIONS).find(([key, collection]) => {
+    const pfx = collection.PFX;
+    return pfx.some((p) => url.startsWith(p));
+  });
+  return match ? match[0] : null;
+}
+
 // TODO: will be a generic method that posts url of any type, picking the right endpoint to call
 const postUrlAndReply = async (urlOrId: string): Promise<string> => {
-  const endpoint: string = "scrape/goodreads";
+  let msg: string;
+  // const collectionKey: DataCollections | null = getKeyFromUrl(urlOrId);
+  // const validPfxs = Object.values(COLLECTIONS).map(
+  //   (collection) => collection.PFX
+  // );
+  const validPfxs = Object.values(COLLECTIONS).flatMap(
+    (collection) => collection.PFX
+  );
+  const collectionKey = getKeyFromUrl(urlOrId);
+  if (collectionKey === null) {
+    msg = `please pass valid URL, one of: \n\n${validPfxs.join("\n")}`;
+    return msg;
+  }
+  // TODO: make bookExists generic, check if table exists first
+  // if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
+  //   ctx.reply("Book already exists in summary database");
+  //   return;
+  // }
+
+  console.log(`it is from collection ${collectionKey}`);
+
+  // const endpoint: string = "scrape/goodreads";
+  const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT;
   const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}/?url=${urlOrId}`;
   console.debug(`url: ${url}`);
-  let msg: string;
   try {
     const response = await axios.post(url);
     console.log("response: " + JSON.stringify(response.data));
@@ -273,6 +293,6 @@ export {
   getUserSettings,
   updateUserSettings,
   getAndWarnDatabaseId,
-  scrapeAndReply,
+  // scrapeAndReply,
   postUrlAndReply,
 };

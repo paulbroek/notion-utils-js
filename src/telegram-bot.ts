@@ -9,7 +9,6 @@ import {
   updateUserSettings,
   getUserSettings,
   getAndWarnDatabaseId,
-  scrapeAndReply,
   postUrlAndReply,
 } from "./telegram";
 import { databaseExistsForUser, deleteLastSummary, deleteSummaryById } from ".";
@@ -125,7 +124,7 @@ bot.command("add", async (ctx) => {
   // await scrapeAndReply(ctx, msg);
   // TODO: call fastAPI instead
   const replyMsg: string = await postUrlAndReply(msg);
-  ctx.reply(replyMsg);
+  ctx.reply(replyMsg, { disable_web_page_preview: true });
 });
 
 // bot.on("text", async (ctx) => {
