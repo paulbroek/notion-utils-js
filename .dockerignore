@@ -9,3 +9,4 @@ infra
 *.tfstate
 *.tfstate.*
 
+node_modules

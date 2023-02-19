@@ -9,7 +9,8 @@ import { addSummaryToTable, bookExistsInTable } from "../";
 import scrapeBookRetry from "../scrape";
 import { bookScrapeItem } from "../models/bookScrapeItem";
 import axios from "axios";
-import { DataCollections } from "../enums";
+// import { DataCollection } from "../enums";
+import { DataCollection, UserCollection } from "@prisma/client";
 import { COLLECTIONS } from "../types";
 
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
@@ -61,7 +62,11 @@ const connectTelegramClient = async (
 
 // TODO: turn into decorator that checks condition
 const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
-  const userSettings = await getUserSettings(ctx.from.id);
+  // const userSettings = await getUserSettings(ctx.from.id);
+  const userSettings = await getUserCollection(
+    ctx.from.id,
+    DataCollection.GOODREADS
+  );
   if (userSettings == null || !userSettings?.databaseId) {
     ctx.reply(
       "please set a databaseId first using\n /set_database_id YOUR_DATABASE_ID"
@@ -120,14 +125,14 @@ const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
 //   }
 // };
 
-// function getKeyFromUrl(url: string): DataCollections | null {
+// function getKeyFromUrl(url: string): DataCollection | null {
 // function getKeyFromUrl(url: string) {
 //   const match = Object.entries(COLLECTIONS).find(([key, collection]) =>
 //     url.startsWith(collection.PFX)
 //   );
-//   // as [keyof typeof DataCollections, Collection];
+//   // as [keyof typeof DataCollection, Collection];
 
-//   // return match ? (match[0] as DataCollections) : null;
+//   // return match ? (match[0] as DataCollection) : null;
 //   return match ? match[0] : null;
 // }
 
@@ -142,7 +147,7 @@ function getKeyFromUrl(url: string) {
 // TODO: will be a generic method that posts url of any type, picking the right endpoint to call
 const postUrlAndReply = async (urlOrId: string): Promise<string> => {
   let msg: string;
-  // const collectionKey: DataCollections | null = getKeyFromUrl(urlOrId);
+  // const collectionKey: DataCollection | null = getKeyFromUrl(urlOrId);
   // const validPfxs = Object.values(COLLECTIONS).map(
   //   (collection) => collection.PFX
   // );
@@ -160,7 +165,8 @@ const postUrlAndReply = async (urlOrId: string): Promise<string> => {
   //   return;
   // }
 
-  console.log(`it is from collection ${collectionKey}`);
+  const collectionName: string = COLLECTIONS[collectionKey].NAME;
+  console.log(`it is from collection ${collectionName}`);
 
   // const endpoint: string = "scrape/goodreads";
   const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT;
@@ -248,12 +254,26 @@ const pushMessage = async (
   console.debug(`pushed message: ${msgText}`);
 };
 
-const getUserSettings = async (telegramUserId: number) => {
-  console.log("telegramUserId: ", telegramUserId);
-  const userSettings = await prisma.userSettings.findFirst({
-    where: { user: { telegramId: telegramUserId } },
+// Depreciated, use getUserCollection
+// const getUserSettings = async (telegramUserId: number) => {
+//   console.log("telegramUserId: ", telegramUserId);
+//   const userSettings = await prisma.userSettings.findFirst({
+//     where: { user: { telegramId: telegramUserId } },
+//   });
+//   return userSettings;
+// };
+
+const getUserCollection = async (
+  telegramUserId: number,
+  collection: DataCollection
+): Promise<UserCollection | null> => {
+  const userCollection = await prisma.userCollection.findFirst({
+    where: {
+      userSettings: { user: { telegramId: telegramUserId } },
+      collection,
+    },
   });
-  return userSettings;
+  return userCollection;
 };
 
 const updateUserSettings = async (telegramUserId: number, settings: object) => {
@@ -290,7 +310,8 @@ export {
   getLastMessage,
   upsertUser,
   pushMessage,
-  getUserSettings,
+  getUserCollection,
+  // getUserSettings,
   updateUserSettings,
   getAndWarnDatabaseId,
   // scrapeAndReply,

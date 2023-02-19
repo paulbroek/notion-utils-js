@@ -3,11 +3,14 @@ import { Update } from "typegram";
 
 import { createBotCommandsSummary } from "./utils";
 
+import { DataCollection } from "@prisma/client";
+
 import version from "project-version";
 import {
   upsertUser,
   updateUserSettings,
-  getUserSettings,
+  // getUserSettings,
+  getUserCollection,
   getAndWarnDatabaseId,
   postUrlAndReply,
 } from "./telegram";
@@ -35,18 +38,27 @@ bot.help((ctx) => {
 
 bot.command("get_current_database_id", async (ctx) => {
   console.log("DATABASE_URL: ", process.env.DATABASE_URL);
-  const userSettings = await getUserSettings(ctx.from.id);
+  // const userSettings = await getUserSettings(ctx.from.id);
+  const userSettings = await getUserCollection(
+    ctx.from.id,
+    DataCollection.GOODREADS
+  );
+
   ctx.reply("current databaseId: \n" + userSettings?.databaseId);
+  // ctx.reply("current databaseId: \n" + userSettings?.databaseId);
 });
 
 bot.command("set_database_id", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
   // console.log("msgs: ", JSON.stringify(msgs));
-  if (msgs.length != 2) {
-    ctx.reply("please pass one databaseId");
+  if (msgs.length != 3) {
+    ctx.reply(
+      "please pass a collection and databaseId, example: \n\nset_database_id youtube 39j239jasdfkj233f"
+    );
     return;
   }
-  const databaseId: string = msgs[1];
+  const collection: string = msgs[1];
+  const databaseId: string = msgs[2];
   // TODO: how to save this state when restarting bot?
   // -> use DB to store user data
   // database exists for user?

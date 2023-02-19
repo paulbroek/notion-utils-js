@@ -20,12 +20,15 @@ RUN apt-get update && apt-get install gnupg wget -y && \
   apt-get install google-chrome-stable -y --no-install-recommends && \
   rm -rf /var/lib/apt/lists/*
 
-# COPY /src .
+# generate prisma client
+COPY prisma . 
+RUN npx prisma generate
+
+# COPY /src /src
+# COPY tsconfig.json .
 COPY . .
 RUN npm run build
 
-# generate prisma client
-RUN npx prisma generate
 # RUN yarn prisma generate
 
 USER node

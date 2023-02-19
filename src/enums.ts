@@ -1,5 +1,5 @@
-export const enum DataCollections {
-  GOODREADS,
-  YOUTUBE,
-  PODCHASER,
-}
+// export const enum DataCollection {
+//   GOODREADS,
+//   YOUTUBE,
+//   PODCHASER,
+// }
