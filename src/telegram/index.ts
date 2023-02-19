@@ -76,65 +76,6 @@ const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
 
   return userSettings.databaseId;
 };
-// const scrapeAndReply = async (ctx: Context, msg: string) => {
-//   // check if databaseId is set
-//   const databaseId = await getAndWarnDatabaseId(ctx);
-//   if (databaseId == null) {
-//     return;
-//   }
-
-//   // check if msg is valid URL or ask user
-//   if (!msg.startsWith(Prefix.GOODREADS)) {
-//     ctx.reply("please pass valid goodreads book URL");
-//     return;
-//   }
-//   // throw away any url encoded queries
-//   const goodreadsUrl: string = msg.split("?")[0];
-
-//   if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
-//     ctx.reply("Book already exists in summary database");
-//     return;
-//   }
-
-//   // user feedback, send message when starting scrape process, delete it when finished / error
-//   const { message_id } = await ctx.reply("scraping..");
-
-//   const scrapeRes: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
-//   // ctx.reply(`res: ${JSON.stringify(res)}`);
-//   await ctx.deleteMessage(message_id);
-
-//   // create notion page, ask user first
-//   if (scrapeRes) {
-//     const addResult = await addSummaryToTable(scrapeRes, databaseId);
-
-//     if (!addResult) {
-//       ctx.reply("could not add result to Notion");
-//       // TODO: retry automatically?
-//     } else {
-//       // console.log("addResult: ", JSON.stringify(addResult));
-//       // FIXME: very ugly method, but notion API does not allow to see properties of response directly
-//       // See: https://github.com/makenotion/notion-sdk-js/issues/247
-
-//       // const recreatedObject = JSON.parse(JSON.stringify(addResult));
-//       // console.log("addResult.reparsed: ", recreatedObject.url);
-//       // ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
-//       ctx.reply(`Done! Visit the summary at: \n${addResult["url"]}`);
-//     }
-//   } else {
-//     ctx.reply("Could not scrape Goodreads page");
-//   }
-// };
-
-// function getKeyFromUrl(url: string): DataCollection | null {
-// function getKeyFromUrl(url: string) {
-//   const match = Object.entries(COLLECTIONS).find(([key, collection]) =>
-//     url.startsWith(collection.PFX)
-//   );
-//   // as [keyof typeof DataCollection, Collection];
-
-//   // return match ? (match[0] as DataCollection) : null;
-//   return match ? match[0] : null;
-// }
 
 function getKeyFromUrl(url: string) {
   const match = Object.entries(COLLECTIONS).find(([key, collection]) => {
@@ -147,10 +88,6 @@ function getKeyFromUrl(url: string) {
 // TODO: will be a generic method that posts url of any type, picking the right endpoint to call
 const postUrlAndReply = async (urlOrId: string): Promise<string> => {
   let msg: string;
-  // const collectionKey: DataCollection | null = getKeyFromUrl(urlOrId);
-  // const validPfxs = Object.values(COLLECTIONS).map(
-  //   (collection) => collection.PFX
-  // );
   const validPfxs = Object.values(COLLECTIONS).flatMap(
     (collection) => collection.PFX
   );
