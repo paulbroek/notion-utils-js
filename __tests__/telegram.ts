@@ -33,7 +33,7 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
   try {
     // 0. Set database_id to test database
     await client.sendMessage(chatId, {
-      message: `/set_database_id ${databaseId}`,
+      message: `/set_database_id goodreads ${databaseId}`,
     });
     await delay(1500);
     // check if bot replied with this databaseId
