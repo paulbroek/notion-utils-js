@@ -137,6 +137,9 @@ bot.command("add", async (ctx) => {
   // TODO: call fastAPI instead
   const replyMsg: string = await postUrlAndReply(msg);
   ctx.reply(replyMsg, { disable_web_page_preview: true });
+
+  // TODO: wait for item to be scraped, and add to notion table
+  // addSummaryToTable ..
 });
 
 // bot.on("text", async (ctx) => {
