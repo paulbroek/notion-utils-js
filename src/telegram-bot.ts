@@ -8,8 +8,9 @@ import { DataCollection } from "@prisma/client";
 import version from "project-version";
 import {
   upsertUser,
-  updateUserSettings,
+  addUserCollection,
   // getUserSettings,
+  resetUserCollections,
   getUserCollection,
   getAndWarnDatabaseId,
   postUrlAndReply,
@@ -57,7 +58,17 @@ bot.command("set_database_id", async (ctx) => {
     );
     return;
   }
-  const collection: string = msgs[1];
+  const collection: DataCollection = msgs[1].toUpperCase() as DataCollection;
+  // check if collection exists
+  if (!Object.values(DataCollection).includes(collection)) {
+    ctx.reply(
+      `Invalid collection name. Supported collections are: ${Object.values(
+        DataCollection
+      ).join(", ")}`
+    );
+    return;
+  }
+
   const databaseId: string = msgs[2];
   // TODO: how to save this state when restarting bot?
   // -> use DB to store user data
@@ -67,16 +78,25 @@ bot.command("set_database_id", async (ctx) => {
     return;
   }
 
-  await updateUserSettings(ctx.from.id, { databaseId: databaseId });
+  // await updateUserSettings(ctx.from.id, { databaseId: databaseId });
+  const success: boolean = await addUserCollection(
+    ctx.from.id,
+    collection,
+    databaseId
+  );
 
-  ctx.reply("databaseId was set to: \n" + databaseId);
+  if (success) {
+    ctx.reply("databaseId was set to: \n" + databaseId);
+  } else {
+    ctx.reply("databaseId was not set");
+  }
 });
 
-bot.command("reset_database_id", async (ctx) => {
-  const newDatabaseId = null;
-  await updateUserSettings(ctx.from.id, { databaseId: newDatabaseId });
+bot.command("reset_database_ids", async (ctx) => {
+  const success: boolean = await resetUserCollections(ctx.from.id);
+  if (success) return ctx.reply("reset all databaseIds for user");
 
-  ctx.reply("databaseId was set to: \n" + newDatabaseId);
+  return ctx.reply("could not reset all databaseIds");
 });
 
 bot.command("nrow", async () => {
@@ -129,6 +149,7 @@ bot.command("add", async (ctx) => {
   const msg = msgs[1];
 
   // get or create user from DB
+  // TODO: should always run, for every endpoint
   await upsertUser(ctx.message);
   // TODO: implement pushMessage, save all messages to db
   // await pushMessage(ctx.from.id, ctx.update.message);

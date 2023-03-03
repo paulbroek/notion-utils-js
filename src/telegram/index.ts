@@ -10,7 +10,11 @@ import scrapeBookRetry from "../scrape";
 import { bookScrapeItem } from "../models/bookScrapeItem";
 import axios from "axios";
 // import { DataCollection } from "../enums";
-import { DataCollection, UserCollection } from "@prisma/client";
+import {
+  DataCollection,
+  UserCollection,
+  User as PrismaUser,
+} from "@prisma/client";
 import { COLLECTIONS } from "../types";
 
 const apiId: number = parseInt(process.env.TELEGRAM_API_ID || "") as number;
@@ -20,6 +24,10 @@ const API_PORT: string = process.env.API_PORT as string;
 
 console.error("process.env.TELEGRAM_API_HASH: ", apiHash);
 console.error("process.env.DATABASE_URL: ", process.env.DATABASE_URL);
+
+interface User extends PrismaUser {
+  collections: UserCollection[];
+}
 
 const prisma = new PrismaClient();
 
@@ -191,55 +199,136 @@ const pushMessage = async (
   console.debug(`pushed message: ${msgText}`);
 };
 
-// Depreciated, use getUserCollection
-// const getUserSettings = async (telegramUserId: number) => {
-//   console.log("telegramUserId: ", telegramUserId);
-//   const userSettings = await prisma.userSettings.findFirst({
-//     where: { user: { telegramId: telegramUserId } },
-//   });
-//   return userSettings;
-// };
-
 const getUserCollection = async (
   telegramUserId: number,
   collection: DataCollection
 ): Promise<UserCollection | null> => {
   const userCollection = await prisma.userCollection.findFirst({
     where: {
-      userSettings: { user: { telegramId: telegramUserId } },
+      user: { telegramId: telegramUserId },
       collection,
     },
   });
   return userCollection;
 };
 
-const updateUserSettings = async (telegramUserId: number, settings: object) => {
-  // TODO: rewrite this is into a single query, use `connect`?
-  const user = await prisma.user.findUnique({
+async function getUser(telegramUserId: number): Promise<User | null> {
+  return await prisma.user.findUnique({
     where: { telegramId: telegramUserId },
+    include: { collections: true },
   });
+}
 
+// reset UserCollections for user
+const resetUserCollections = async (
+  telegramUserId: number
+): Promise<boolean> => {
+  const user: User | null = await getUser(telegramUserId);
   if (!user) {
     console.error(`cannot find user ${telegramUserId}`);
-    return;
+    return false;
+  }
+  try {
+    await prisma.userCollection.deleteMany({
+      where: { userId: user.id },
+    });
+    console.log(
+      `All UserCollections for user ${telegramUserId} have been deleted`
+    );
+    return true;
+  } catch (error) {
+    console.error(
+      `Error deleting UserCollections for user ${telegramUserId}`,
+      error
+    );
   }
 
-  const userSettings = { userId: user.id, ...settings };
-
-  await prisma.userSettings.upsert({
-    create: userSettings,
-    update: settings,
-    where: { userId: user.id },
-  });
-
-  // const res = await prisma.user.update({
-  //   data: { userSettings: settings },
-  //   where: { telegramId: telegramUserId },
-  // });
-
-  // console.debug(`updated userSettings: ${JSON.stringify(res)}`);
-  console.debug(`updated userSettings: ${JSON.stringify(userSettings)}`);
+  return false;
 };
+
+const addUserCollection = async (
+  telegramUserId: number,
+  collection: DataCollection,
+  databaseId: string
+): Promise<boolean> => {
+  const user: User | null = await getUser(telegramUserId);
+  if (!user) {
+    console.error(`cannot find user ${telegramUserId}`);
+    return false;
+  }
+  // console.log(
+  //   `user: ${JSON.stringify({
+  //     ...user,
+  //     telegramId: user.telegramId.toString(),
+  //   })}`
+  // );
+
+  const existingCollection = user.collections.find(
+    (c) => c.collection === collection
+  );
+
+  if (existingCollection) {
+    // Update the existing collection record
+    await prisma.userCollection.update({
+      where: { id: existingCollection.id },
+      data: { databaseId, collection },
+    });
+  } else {
+    // Create a new collection record
+    try {
+      await prisma.userCollection.create({
+        data: {
+          collection,
+          databaseId,
+          user: { connect: { id: user.id } },
+        },
+      });
+    } catch (e) {
+      // If there was a unique constraint violation, update the existing record instead
+      if (e.code === "P2002") {
+        // TODO: implement
+        console.log("should update userCollection");
+
+        // await prisma.userCollection.update({
+        //   where: { userId: user.id, collection: { equals: collection } },
+        //   data: { databaseId },
+        // });
+        return false;
+      } else {
+        throw e;
+      }
+    }
+  }
+  return true;
+};
+
+// const updateUserSettings = async (telegramUserId: number, settings: object) => {
+//   // TODO: rewrite this is into a single query, use `connect`?
+//   const user = await prisma.user.findUnique({
+//     where: { telegramId: telegramUserId },
+//   });
+
+//   if (!user) {
+//     console.error(`cannot find user ${telegramUserId}`);
+//     return;
+//   }
+
+//   const userSettings = { userId: user.id, ...settings };
+
+//   await prisma.userSettings.upsert({
+//     create: userSettings,
+//     update: settings,
+//     where: { userId: user.id },
+//   });
+
+//   // const res = await prisma.user.update({
+//   //   data: { userSettings: settings },
+//   //   where: { telegramId: telegramUserId },
+//   // });
+
+//   // console.debug(`updated userSettings: ${JSON.stringify(res)}`);
+//   console.debug(`updated userSettings: ${JSON.stringify(userSettings)}`);
+// };
 
 export {
   createTelegramClient,
@@ -249,7 +338,8 @@ export {
   pushMessage,
   getUserCollection,
   // getUserSettings,
-  updateUserSettings,
+  resetUserCollections,
+  addUserCollection,
   getAndWarnDatabaseId,
   // scrapeAndReply,
   postUrlAndReply,

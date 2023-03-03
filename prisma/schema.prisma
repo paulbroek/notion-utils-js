@@ -23,8 +23,10 @@ model User {
   isBot        Boolean  @default(false)
   isPremium    Boolean? @default(false)
 
-  Message      Message[]
-  userSettings UserSettings?
+  Message Message[]
+
+  collections UserCollection[]
+  // UserSettings UserSettings?
 
   @@index([telegramId, createdAt])
 }
@@ -37,27 +39,35 @@ enum DataCollection {
 }
 
 model UserCollection {
-  id             String         @id @default(uuid())
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id         String         @id @default(uuid())
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
   // collection     Collection         @enum(name: "DataCollection")
-  collection     DataCollection
-  databaseId     String?
-  userSettings   UserSettings   @relation(fields: [userSettingsId], references: [id])
-  userSettingsId String
+  collection DataCollection @unique
+  databaseId String?        @unique
+  // userSettings   UserSettings   @relation(fields: [userSettingsId], references: [id])
+  // userSettingsId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  // UserSettings   UserSettings? @relation(fields: [userSettingsId], references: [id])
+  // userSettingsId String?
+
+  // @@unique([collection, databaseId])
 }
 
 // save user settings, like database in use, how to reply to msgs, etc
-model UserSettings {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  // databaseId String?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
+// model UserSettings {
+//   id        String   @id @default(uuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   // databaseId String?
+//   user      User     @relation(fields: [userId], references: [id])
+//   userId    String   @unique
 
-  collections UserCollection[]
-}
+//   collections UserCollection[]
+// }
 
 model Message {
   id        String   @id @default(uuid())
