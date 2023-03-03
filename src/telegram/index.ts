@@ -212,6 +212,17 @@ const getUserCollection = async (
   return userCollection;
 };
 
+const getUserCollections = async (
+  telegramUserId: number
+): Promise<UserCollection[] | null> => {
+  const collections = await prisma.userCollection.findMany({
+    where: {
+      user: { telegramId: telegramUserId },
+    },
+  });
+  return collections;
+};
+
 async function getUser(telegramUserId: number): Promise<User | null> {
   return await prisma.user.findUnique({
     where: { telegramId: telegramUserId },
@@ -337,6 +348,7 @@ export {
   upsertUser,
   pushMessage,
   getUserCollection,
+  getUserCollections,
   // getUserSettings,
   resetUserCollections,
   addUserCollection,

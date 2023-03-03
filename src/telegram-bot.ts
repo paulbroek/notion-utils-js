@@ -9,9 +9,9 @@ import version from "project-version";
 import {
   upsertUser,
   addUserCollection,
-  // getUserSettings,
   resetUserCollections,
   getUserCollection,
+  getUserCollections,
   getAndWarnDatabaseId,
   postUrlAndReply,
 } from "./telegram";
@@ -38,58 +38,67 @@ bot.help((ctx) => {
 });
 
 bot.command("get_current_database_id", async (ctx) => {
-  console.log("DATABASE_URL: ", process.env.DATABASE_URL);
-  // const userSettings = await getUserSettings(ctx.from.id);
-  const userSettings = await getUserCollection(
-    ctx.from.id,
-    DataCollection.GOODREADS
-  );
-
-  ctx.reply("current databaseId: \n" + userSettings?.databaseId);
-  // ctx.reply("current databaseId: \n" + userSettings?.databaseId);
-});
-
-bot.command("set_database_id", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
-  // console.log("msgs: ", JSON.stringify(msgs));
-  if (msgs.length != 3) {
-    ctx.reply(
-      "please pass a collection and databaseId, example: \n\nset_database_id youtube 39j239jasdfkj233f"
+  if (msgs.length != 2) {
+    return ctx.reply(
+      "please pass a collection, example: \nget_current_database_id youtube"
     );
-    return;
   }
   const collection: DataCollection = msgs[1].toUpperCase() as DataCollection;
+
   // check if collection exists
   if (!Object.values(DataCollection).includes(collection)) {
-    ctx.reply(
+    return ctx.reply(
       `Invalid collection name. Supported collections are: ${Object.values(
         DataCollection
       ).join(", ")}`
     );
-    return;
+  }
+  const userCollection = await getUserCollection(ctx.from.id, collection);
+
+  return ctx.reply("current databaseId: \n" + userCollection?.databaseId);
+});
+
+bot.command("get_user_collections", async (ctx) => {
+  console.log("DATABASE_URL: ", process.env.DATABASE_URL);
+  const collections = await getUserCollections(ctx.from.id);
+
+  ctx.reply("current user collections: \n" + JSON.stringify(collections));
+});
+
+bot.command("set_database_id", async (ctx) => {
+  const msgs = ctx.update.message.text.split(" ");
+  if (msgs.length != 3) {
+    return ctx.reply(
+      "please pass a collection and databaseId, example: \n\nset_database_id youtube 75f14122dabc4196c6f37f92b580bbfc"
+    );
+  }
+  const collection: DataCollection = msgs[1].toUpperCase() as DataCollection;
+
+  // check if collection exists
+  if (!Object.values(DataCollection).includes(collection)) {
+    return ctx.reply(
+      `Invalid collection name. Supported collections are: ${Object.values(
+        DataCollection
+      ).join(", ")}`
+    );
   }
 
   const databaseId: string = msgs[2];
-  // TODO: how to save this state when restarting bot?
-  // -> use DB to store user data
   // database exists for user?
   if (!(await databaseExistsForUser(databaseId))) {
-    ctx.reply("databaseId does not exist for user");
-    return;
+    return ctx.reply("databaseId does not exist for user");
   }
 
-  // await updateUserSettings(ctx.from.id, { databaseId: databaseId });
   const success: boolean = await addUserCollection(
     ctx.from.id,
     collection,
     databaseId
   );
 
-  if (success) {
-    ctx.reply("databaseId was set to: \n" + databaseId);
-  } else {
-    ctx.reply("databaseId was not set");
-  }
+  if (success) return ctx.reply("databaseId was set to: \n" + databaseId);
+
+  return ctx.reply("databaseId was not set");
 });
 
 bot.command("reset_database_ids", async (ctx) => {
@@ -158,8 +167,10 @@ bot.command("add", async (ctx) => {
   // TODO: call fastAPI instead
   const replyMsg: string = await postUrlAndReply(msg);
   ctx.reply(replyMsg, { disable_web_page_preview: true });
+  // Either the item exists in db, you can immediately request AddRowToTable microservice, OR
 
   // TODO: wait for item to be scraped, and add to notion table
+  // TODO: subscribe to RabbitMQ
   // addSummaryToTable ..
 });
 
