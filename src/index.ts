@@ -160,6 +160,7 @@ const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   return resLen ? true : false;
 };
 
+// TODO: turn into generic method that can accept any form of data, matching the Collection type
 const addSummaryToTable = async (
   item: bookScrapeItem,
   databaseId: string

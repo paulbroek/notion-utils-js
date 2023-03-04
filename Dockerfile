@@ -32,4 +32,4 @@ RUN npm run build
 # RUN yarn prisma generate
 
 USER node
-ENTRYPOINT ["node", "./dist/telegram-bot.js"]
+# ENTRYPOINT ["node", "./dist/telegram-bot.js"]

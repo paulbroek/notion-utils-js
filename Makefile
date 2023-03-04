@@ -1,5 +1,9 @@
 ENV_FILE=./.env.test
 
+CONTENT_SERVICE=add-content-service
+# dc='docker-compose -f docker-compose.test.yml'
+COMPOSE_CONFIG=docker-compose.test.yml
+
 .PHONY: install
 install:
 	yarn install
@@ -15,6 +19,17 @@ bot:
 	docker-compose -f docker-compose.test.yml build && \
 	docker-compose -f docker-compose.test.yml up -d telegram-bot && \
 	docker-compose -f docker-compose.test.yml logs -f telegram-bot
+
+# .PHONY: content-service
+# content-service:
+# 	docker rm -f $(CONTENT_SERVICE_NAME) && docker-compose -f $(COMPOSE_CONFIG) --build -d $(CONTENT_SERVICE_NAME) && docker-compose -f $(COMPOSE_CONFIG) logs -f $(CONTENT_SERVICE_NAME)
+
+.PHONY: content-service
+content-service:
+	docker rm -f $(CONTENT_SERVICE) && \
+	docker-compose -f docker-compose.test.yml build && \
+	docker-compose -f docker-compose.test.yml up -d $(CONTENT_SERVICE) && \
+	docker-compose -f docker-compose.test.yml logs -f $(CONTENT_SERVICE)
 
 .PHONY: logs
 logs: 

@@ -12,7 +12,22 @@ services:
       NODE_ENV: test
     env_file:
       - .env.test
-    # command: ["node", "./dist/telegram-bot.js"]
+    command: ["node", "./dist/telegram-bot.js"]
+    volumes:
+      - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
+
+  add-content-service:
+    image: notion-utils-js
+    container_name: add-content-service
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: test
+    env_file:
+      - .env.test
+    command: ["node", "./dist/add-content-service.js"]
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
