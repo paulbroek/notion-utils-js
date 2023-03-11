@@ -37,6 +37,7 @@ amqp.connect(RMQ_CONNECTION_URL, (error0, connection) => {
         // TODO: check if row exists in table?
 
         // TODO: make generic, support any collection content type
+        // TODO: and make any user
         try {
           const { item, databaseId } = message as {
             item: bookScrapeItem;

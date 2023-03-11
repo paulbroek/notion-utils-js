@@ -20,7 +20,7 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 // (async () => getPage(pageId))();
 
 const deletePage = async (pageId: string) => {
-  // beset practice is to not actually delete, but set `archived` to true.
+  // best practice is to not actually delete, but set `archived` to true.
   // also safer for exposing Notion through Telegram, if anyone would get access to your bot.
   await notion.pages.update({ page_id: pageId, archived: true });
   console.log("page deleted");
@@ -204,8 +204,8 @@ const addSummaryToTable = async (
               content: item.author,
               link: {
                 // TODO: inject author URL
-                // url: item.authorUrl,
-                url: "http://www.nu.nl",
+                url: item.authorUrl,
+                // url: "http://www.nu.nl",
               },
             },
           },
