@@ -25,7 +25,7 @@ const NOT_IMPLEMENTED: string = "command not implemented yet";
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
-// TODO: not sure if this is best approach, `Telegraf` only interacts with Telegram API. `Telegram` can send messages directly to any chatId
+// TODO: is this best approach? `Telegraf` only interacts with Telegram API. `Telegram` can send messages directly to any chatId
 const telegram: Telegram = new Telegram(
   process.env.TELEGRAM_BOT_TOKEN as string
 );

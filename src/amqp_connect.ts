@@ -1,9 +1,18 @@
 import amqp from "amqplib/callback_api";
 import { Context, Telegraf, Telegram } from "telegraf";
+import axios from "axios";
 import { Update } from "typegram";
+
+const API_HOST: string = process.env.API_HOST as string;
+const API_PORT: string = process.env.API_PORT as string;
+
+const MAX_RETRIES = 5;
+const RETRY_TIMEOUT_MS = 5000;
 
 console.log("rmq url: ", process.env.RMQ_URL);
 
+// connect to rabbitmq
+// auto reconnect for lost connection
 export const amqp_connect = (
   bot: Telegraf<Context<Update>>,
   telegram: Telegram,
@@ -40,15 +49,20 @@ export const amqp_connect = (
           return;
         }
 
-        const queue = process.env.RMQ_PUBLISH_QUEUE;
-        channel.assertQueue(queue, { durable: false });
+        // the queue of ready-to-add items. they exist in db
+        const queue_publish = process.env.RMQ_PUBLISH_QUEUE;
+        channel.assertQueue(queue_publish, { durable: false });
+
+        // the queue of not-ready-to-add items. they are being scraped
+        const queue_to_scrape = process.env.RMQ_VERIFY_SCRAPED_QUEUE;
+        channel.assertQueue(queue_to_scrape, { durable: false });
 
         console.log(
-          ` [*] Waiting for messages in ${queue}. To exit press CTRL+C`
+          ` [*] Waiting for messages in ${queue_publish} and ${queue_to_scrape}. To exit press CTRL+C`
         );
 
         channel.consume(
-          queue,
+          queue_publish,
           (msg) => {
             const raw_message: string = msg.content.toString();
             console.log(` [x] Received ${raw_message}`);
@@ -67,6 +81,88 @@ export const amqp_connect = (
                   `Chat ${chatId} does not exist: ${error.description}`
                 );
               });
+          },
+          { noAck: true }
+        );
+
+        channel.consume(
+          queue_to_scrape,
+          async (msg) => {
+            const raw_message: string = msg.content.toString();
+            console.log(` [x] Received to_scrape message: ${raw_message}`);
+
+            const message = JSON.parse(raw_message);
+            const chatId = message.telegramChatId;
+
+            // TODO: now periodically check if item exists in database
+            // not sure if this is best approach, calling pg/book endpoint directly
+
+            const endpoint: string = "pg/book";
+            const params = { url_or_id: message.url };
+
+            // const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}`;
+            const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}?url_or_id=${message.url}`;
+            console.debug(`url: ${url}`);
+
+            // TODO: max 5 times call api
+            let retries = 0;
+            while (retries < MAX_RETRIES) {
+              try {
+                const response = await axios.get(url);
+                console.log(
+                  "pg/book response: " + JSON.stringify(response.data)
+                );
+                console.log(`retries: ${retries}`);
+                if (response.data.success) {
+                  msg = `added book to Notion page in ${
+                    retries * (RETRY_TIMEOUT_MS / 1000)
+                  } seconds`;
+                  console.log(msg);
+                  bot.telegram
+                    .getChat(chatId)
+                    .then((chat) => {
+                      telegram.sendMessage(chatId, msg);
+                    })
+                    .catch((error) => {
+                      console.log(
+                        `Chat ${chatId} does not exist: ${error.description}`
+                      );
+                    });
+                  return;
+                }
+                // return response.data.message;
+              } catch (error) {
+                // TODO: do not output to user, but to issue list
+                msg = "internal error calling api: " + error.response.body;
+                console.log(msg);
+                console.log("error.message: " + error.message);
+
+                return;
+              }
+
+              retries++;
+
+              if (retries < MAX_RETRIES) {
+                console.log(`Retrying in ${RETRY_TIMEOUT_MS}ms...`);
+                await new Promise((resolve) =>
+                  setTimeout(resolve, RETRY_TIMEOUT_MS)
+                );
+              } else {
+                console.log(`Max retries reached (${MAX_RETRIES}).`);
+                msg = "could not add row to notion table, inform admin";
+                //   return msg;
+                bot.telegram
+                  .getChat(chatId)
+                  .then((chat) => {
+                    telegram.sendMessage(chatId, msg);
+                  })
+                  .catch((error) => {
+                    console.log(
+                      `Chat ${chatId} does not exist: ${error.description}`
+                    );
+                  });
+              }
+            }
           },
           { noAck: true }
         );

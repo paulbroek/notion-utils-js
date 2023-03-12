@@ -111,7 +111,7 @@ const postUrlAndReply = async (
   const collectionName: string = COLLECTIONS[collectionKey].NAME;
   console.log(`it is from collection ${collectionName}`);
 
-  // TODO: collection should be set for user
+  // collection should be set for user
   const userCollectionRes: null | UserCollection = await getUserCollection(
     Number(user.telegramId),
     collectionKey.toUpperCase() as DataCollection
@@ -122,6 +122,7 @@ const postUrlAndReply = async (
     return msg;
   }
 
+  // TODO: retrieve telegramChatId
   const params = {
     url: urlOrId,
     telegramChatId: "-877077753",
@@ -175,7 +176,7 @@ const upsertUser = async (message: Message): Promise<PrismaUser | null> => {
     languageCode: message.from.language_code,
     isBot: message.from.is_bot,
     isPremium: message.from.is_premium,
-    telegramId: telegramUserId,
+    telegramId: `${telegramUserId}`,
   };
 
   console.log(`upserting user: ${telegramUserId}`);
@@ -187,7 +188,7 @@ const upsertUser = async (message: Message): Promise<PrismaUser | null> => {
       firstName: message.from.first_name,
       lastName: message.from.last_name,
     },
-    where: { telegramId: telegramUserId },
+    where: { telegramId: `${telegramUserId}` },
   });
 };
 
@@ -199,7 +200,7 @@ const pushMessage = async (
   // const msgText: string = message.text;
   const msgText: string = "todo: make text";
   const user = await prisma.user.findFirst({
-    where: { telegramId: telegramUserId },
+    where: { telegramId: `${telegramUserId}` },
   });
 
   if (!user) {
@@ -217,7 +218,7 @@ const getUserCollection = async (
 ): Promise<UserCollection | null> => {
   const userCollection = await prisma.userCollection.findFirst({
     where: {
-      user: { telegramId: telegramUserId },
+      user: { telegramId: `${telegramUserId}` },
       collection,
     },
   });
@@ -229,7 +230,7 @@ const getUserCollections = async (
 ): Promise<UserCollection[] | null> => {
   const collections = await prisma.userCollection.findMany({
     where: {
-      user: { telegramId: telegramUserId },
+      user: { telegramId: `${telegramUserId}` },
     },
   });
   return collections;
@@ -237,7 +238,7 @@ const getUserCollections = async (
 
 async function getUser(telegramUserId: number): Promise<User | null> {
   return await prisma.user.findUnique({
-    where: { telegramId: telegramUserId },
+    where: { telegramId: `${telegramUserId}` },
     include: { collections: true },
   });
 }
@@ -310,7 +311,7 @@ const addUserCollection = async (
       // If there was a unique constraint violation, update the existing record instead
       if (e.code === "P2002") {
         // TODO: implement
-        console.log("should update userCollection");
+        console.log("you're using a databaseId that has already been taken");
 
         // await prisma.userCollection.update({
         //   where: { userId: user.id, collection: { equals: collection } },
@@ -325,34 +326,6 @@ const addUserCollection = async (
   return true;
 };
 
-// const updateUserSettings = async (telegramUserId: number, settings: object) => {
-//   // TODO: rewrite this is into a single query, use `connect`?
-//   const user = await prisma.user.findUnique({
-//     where: { telegramId: telegramUserId },
-//   });
-
-//   if (!user) {
-//     console.error(`cannot find user ${telegramUserId}`);
-//     return;
-//   }
-
-//   const userSettings = { userId: user.id, ...settings };
-
-//   await prisma.userSettings.upsert({
-//     create: userSettings,
-//     update: settings,
-//     where: { userId: user.id },
-//   });
-
-//   // const res = await prisma.user.update({
-//   //   data: { userSettings: settings },
-//   //   where: { telegramId: telegramUserId },
-//   // });
-
-//   // console.debug(`updated userSettings: ${JSON.stringify(res)}`);
-//   console.debug(`updated userSettings: ${JSON.stringify(userSettings)}`);
-// };
-
 export {
   createTelegramClient,
   connectTelegramClient,
@@ -361,10 +334,8 @@ export {
   pushMessage,
   getUserCollection,
   getUserCollections,
-  // getUserSettings,
   resetUserCollections,
   addUserCollection,
   getAndWarnDatabaseId,
-  // scrapeAndReply,
   postUrlAndReply,
 };
