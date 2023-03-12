@@ -18,6 +18,8 @@ import {
 import { databaseExistsForUser, deleteLastSummary, deleteSummaryById } from ".";
 import botCommands from "./data/bot-commands.json";
 
+import { User as PrismaUser } from "@prisma/client";
+
 const NOT_IMPLEMENTED: string = "command not implemented yet";
 
 const bot: Telegraf<Context<Update>> = new Telegraf(
@@ -165,19 +167,18 @@ bot.command("add", async (ctx) => {
 
   // get or create user from DB
   // TODO: should always run, for every endpoint
-  await upsertUser(ctx.message);
+  const user: PrismaUser | null = await upsertUser(ctx.message);
   // TODO: implement pushMessage, save all messages to db
   // await pushMessage(ctx.from.id, ctx.update.message);
 
-  // await scrapeAndReply(ctx, msg);
-  // TODO: call fastAPI instead
-  const replyMsg: string = await postUrlAndReply(msg);
-  ctx.reply(replyMsg, { disable_web_page_preview: true });
-  // Either the item exists in db, you can immediately request AddRowToTable microservice, OR
+  // calling api in background
+  if (user) {
+    const replyMsg: string = await postUrlAndReply(msg, user);
+    ctx.reply(replyMsg, { disable_web_page_preview: true });
+  }
 
-  // TODO: wait for item to be scraped, and add to notion table
-  // TODO: subscribe to RabbitMQ
-  // addSummaryToTable ..
+  // Either the item exists in db, you can immediately request AddRowToTable microservice, OR
+  // TODO: subscribe to RabbitMQ / feedback message should return to telegram chat when row got added
 });
 
 // bot.on("text", async (ctx) => {

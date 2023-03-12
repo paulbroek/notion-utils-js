@@ -2,14 +2,9 @@ import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 import { Message } from "typegram";
 import { PrismaClient } from "@prisma/client";
-import { Context, Telegraf } from "telegraf";
 import input from "input";
 
-import { addSummaryToTable, bookExistsInTable } from "../";
-import scrapeBookRetry from "../scrape";
-import { bookScrapeItem } from "../models/bookScrapeItem";
 import axios from "axios";
-// import { DataCollection } from "../enums";
 import {
   DataCollection,
   UserCollection,
@@ -94,7 +89,10 @@ function getKeyFromUrl(url: string) {
 }
 
 // TODO: will be a generic method that posts url of any type, picking the right endpoint to call
-const postUrlAndReply = async (urlOrId: string): Promise<string> => {
+const postUrlAndReply = async (
+  urlOrId: string,
+  user: PrismaUser
+): Promise<string> => {
   let msg: string;
   const validPfxs = Object.values(COLLECTIONS).flatMap(
     (collection) => collection.PFX
@@ -113,15 +111,30 @@ const postUrlAndReply = async (urlOrId: string): Promise<string> => {
   const collectionName: string = COLLECTIONS[collectionKey].NAME;
   console.log(`it is from collection ${collectionName}`);
 
-  // const endpoint: string = "scrape/goodreads";
-  const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT;
-  const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}/?url=${urlOrId}`;
+  // TODO: collection should be set for user
+  const userCollectionRes: null | UserCollection = await getUserCollection(
+    Number(user.telegramId),
+    collectionKey.toUpperCase() as DataCollection
+  );
+  // console.log(`userCollectionRes: ${JSON.stringify(userCollectionRes)}`);
+  if (!userCollectionRes) {
+    msg = `please add databaseId for ${collectionKey} \nby calling /set_database_id ${collectionKey} your_notion_database_id`;
+    return msg;
+  }
+
+  const params = {
+    url: urlOrId,
+    telegramChatId: "-877077753",
+    telegramUserId: `${user.telegramId}`,
+    notionDatabaseId: userCollectionRes.databaseId,
+  };
+  console.debug(`params: ${JSON.stringify(params)}`);
+  const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT + "_add_row";
+  const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}`;
   console.debug(`url: ${url}`);
   try {
-    const response = await axios.post(url);
+    const response = await axios.post(url, {}, { params });
     console.log("response: " + JSON.stringify(response.data));
-    // console.log(response.data.url);
-    // console.log(response.data.explanation);
     if (response.data.success) {
       msg = "success";
     }
@@ -131,7 +144,6 @@ const postUrlAndReply = async (urlOrId: string): Promise<string> => {
     msg = "internal error calling api: " + error.response.body;
     console.log(msg);
     console.log("error.message: " + error.message);
-    // console.log("error: " + error);
     return msg;
   }
 };
@@ -143,15 +155,15 @@ const getLastMessage = async (client: TelegramClient, chatId: number) => {
   return lastMessage;
 };
 
-const upsertUser = async (message: Message) => {
+const upsertUser = async (message: Message): Promise<PrismaUser | null> => {
   if (!message.from) {
     console.error("message should have `from` property");
-    return;
+    return null;
   }
   const telegramUserId: number | undefined = message.from.id;
   if (!telegramUserId) {
     console.error("cannot extract telegramUserId");
-    return;
+    return null;
   }
 
   console.log("telegramUserId: ", telegramUserId);
@@ -166,7 +178,9 @@ const upsertUser = async (message: Message) => {
     telegramId: telegramUserId,
   };
 
-  await prisma.user.upsert({
+  console.log(`upserting user: ${telegramUserId}`);
+
+  return await prisma.user.upsert({
     create: user,
     update: {
       userName: message.from.username,
@@ -175,8 +189,6 @@ const upsertUser = async (message: Message) => {
     },
     where: { telegramId: telegramUserId },
   });
-
-  console.log(`upserted user: ${telegramUserId}`);
 };
 
 const pushMessage = async (

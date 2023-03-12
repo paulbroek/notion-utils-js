@@ -12,7 +12,8 @@ services:
       NODE_ENV: test
     env_file:
       - .env.test
-    command: ["node", "./dist/telegram-bot.js"]
+    # command: ["node", "./dist/telegram-bot.js"]
+    command: ["ts-node", "./src/telegram-bot.ts"]
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 

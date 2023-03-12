@@ -18,7 +18,8 @@ model User {
   lastName     String?
   userName     String?
   languageCode String?
-  telegramId   BigInt   @unique
+  telegramId   Int      @unique
+  // telegramId   BigInt   @unique
   // telegramId   String   @unique
   isBot        Boolean  @default(false)
   isPremium    Boolean? @default(false)

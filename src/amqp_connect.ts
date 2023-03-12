@@ -1,4 +1,3 @@
-// TODO: move rabbitmq functionality to other file
 import amqp from "amqplib/callback_api";
 import { Context, Telegraf, Telegram } from "telegraf";
 import { Update } from "typegram";
@@ -7,53 +6,73 @@ console.log("rmq url: ", process.env.RMQ_URL);
 
 export const amqp_connect = (
   bot: Telegraf<Context<Update>>,
-  telegram: Telegram
+  telegram: Telegram,
+  reconnectDelay = 5000 // delay between reconnection attempts in milliseconds
 ) => {
-  amqp.connect(process.env.RMQ_URL, (error0, connection) => {
-    if (error0) {
-      throw error0;
-    }
+  console.log("rmq url: ", process.env.RMQ_URL);
 
-    connection.createChannel((error1, channel) => {
-      if (error1) {
-        throw error1;
+  const connectAndConsume = () => {
+    amqp.connect(process.env.RMQ_URL, (error0, connection) => {
+      if (error0) {
+        console.error("AMQP connection error", error0);
+        setTimeout(connectAndConsume, reconnectDelay);
+        return;
       }
 
-      // TODO: how to pass publish queue msgs to consume?
-      // const queue = process.env.RMQ_CONSUME_QUEUE;
-      const queue = process.env.RMQ_PUBLISH_QUEUE;
+      connection.on("error", (error) => {
+        console.error("AMQP connection error", error);
+        if (!error.message.includes("HEARTBEAT")) {
+          connection.close();
+          setTimeout(connectAndConsume, reconnectDelay);
+        }
+      });
 
-      channel.assertQueue(queue, { durable: false });
+      connection.on("close", () => {
+        console.warn("AMQP connection closed");
+        setTimeout(connectAndConsume, reconnectDelay);
+      });
 
-      console.log(
-        ` [*] Waiting for messages in ${queue}. To exit press CTRL+C`
-      );
+      connection.createChannel((error1, channel) => {
+        if (error1) {
+          console.error("AMQP channel error", error1);
+          connection.close();
+          setTimeout(connectAndConsume, reconnectDelay);
+          return;
+        }
 
-      channel.consume(
-        queue,
-        (msg) => {
-          const raw_message: string = msg.content.toString();
-          console.log(` [x] Received ${raw_message}`);
+        const queue = process.env.RMQ_PUBLISH_QUEUE;
+        channel.assertQueue(queue, { durable: false });
 
-          const message = JSON.parse(raw_message);
-          const chatId = message.telegramChatId;
+        console.log(
+          ` [*] Waiting for messages in ${queue}. To exit press CTRL+C`
+        );
 
-          // check if chatId exists
-          bot.telegram
-            .getChat(chatId)
-            .then((chat) => {
-              // console.log(`Chat ${chatId} exists: ${chat}`);
-              // Send the received message to the Telegram bot
-              telegram.sendMessage(chatId, message.message);
-            })
-            .catch((error) => {
-              console.log(
-                `Chat ${chatId} does not exist: ${error.description}`
-              );
-            });
-        },
-        { noAck: true }
-      );
+        channel.consume(
+          queue,
+          (msg) => {
+            const raw_message: string = msg.content.toString();
+            console.log(` [x] Received ${raw_message}`);
+
+            const message = JSON.parse(raw_message);
+            const chatId = message.telegramChatId;
+
+            // check if chatId exists
+            bot.telegram
+              .getChat(chatId)
+              .then((chat) => {
+                telegram.sendMessage(chatId, message.message);
+              })
+              .catch((error) => {
+                console.log(
+                  `Chat ${chatId} does not exist: ${error.description}`
+                );
+              });
+          },
+          { noAck: true }
+        );
+      });
     });
-  });
+  };
+
+  connectAndConsume();
 };
