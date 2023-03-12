@@ -3,6 +3,8 @@ import { Context, Telegraf, Telegram } from "telegraf";
 import axios from "axios";
 import { Update } from "typegram";
 
+import { postAddRow, getKeyFromUrl } from "./telegram/index";
+
 const API_HOST: string = process.env.API_HOST as string;
 const API_PORT: string = process.env.API_PORT as string;
 
@@ -10,6 +12,22 @@ const MAX_RETRIES = 5;
 const RETRY_TIMEOUT_MS = 5000;
 
 console.log("rmq url: ", process.env.RMQ_URL);
+
+const sendMessageToChat = (
+  bot: Telegraf<Context<Update>>,
+  telegram: Telegram,
+  chatId: string,
+  msg: string
+) => {
+  bot.telegram
+    .getChat(chatId)
+    .then((chat) => {
+      telegram.sendMessage(chatId, msg);
+    })
+    .catch((error) => {
+      console.log(`Chat ${chatId} does not exist: ${error.description}`);
+    });
+};
 
 // connect to rabbitmq
 // auto reconnect for lost connection
@@ -94,17 +112,24 @@ export const amqp_connect = (
             const message = JSON.parse(raw_message);
             const chatId = message.telegramChatId;
 
-            // TODO: now periodically check if item exists in database
+            // periodically check if item exists in database
             // not sure if this is best approach, calling pg/book endpoint directly
 
             const endpoint: string = "pg/book";
-            const params = { url_or_id: message.url };
+            // const params = { url_or_id: message.url };
 
             // const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}`;
             const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}?url_or_id=${message.url}`;
             console.debug(`url: ${url}`);
 
-            // TODO: max 5 times call api
+            sendMessageToChat(
+              bot,
+              telegram,
+              chatId,
+              "item does not exist in db, it is being collected"
+            );
+
+            // max 5 times check if item exists in db
             let retries = 0;
             while (retries < MAX_RETRIES) {
               try {
@@ -114,20 +139,27 @@ export const amqp_connect = (
                 );
                 console.log(`retries: ${retries}`);
                 if (response.data.success) {
+                  // adding the row to notion table via rabbitmq request through fastapi
                   msg = `added book to Notion page in ${
                     retries * (RETRY_TIMEOUT_MS / 1000)
                   } seconds`;
                   console.log(msg);
-                  bot.telegram
-                    .getChat(chatId)
-                    .then((chat) => {
-                      telegram.sendMessage(chatId, msg);
-                    })
-                    .catch((error) => {
-                      console.log(
-                        `Chat ${chatId} does not exist: ${error.description}`
-                      );
-                    });
+                  const collectionKey: string | null = getKeyFromUrl(
+                    message.url
+                  );
+                  if (collectionKey === null) {
+                    msg = `something went wrong, collection cannot be extracted from url: ${message.url}`;
+                    return msg;
+                  }
+                  // TODO: retrieve telegramChatId
+                  const params = {
+                    url: message.url,
+                    telegramChatId: "-877077753",
+                    telegramUserId: message.telegramUserId,
+                    notionDatabaseId: message.databaseId,
+                  };
+                  msg = await postAddRow(params, collectionKey);
+                  sendMessageToChat(bot, telegram, chatId, msg);
                   return;
                 }
                 // return response.data.message;
@@ -151,16 +183,7 @@ export const amqp_connect = (
                 console.log(`Max retries reached (${MAX_RETRIES}).`);
                 msg = "could not add row to notion table, inform admin";
                 //   return msg;
-                bot.telegram
-                  .getChat(chatId)
-                  .then((chat) => {
-                    telegram.sendMessage(chatId, msg);
-                  })
-                  .catch((error) => {
-                    console.log(
-                      `Chat ${chatId} does not exist: ${error.description}`
-                    );
-                  });
+                sendMessageToChat(bot, telegram, chatId, msg);
               }
             }
           },

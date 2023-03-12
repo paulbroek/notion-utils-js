@@ -80,13 +80,13 @@ const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
   return userSettings.databaseId;
 };
 
-function getKeyFromUrl(url: string) {
+const getKeyFromUrl = (url: string): null | string => {
   const match = Object.entries(COLLECTIONS).find(([key, collection]) => {
     const pfx = collection.PFX;
     return pfx.some((p) => url.startsWith(p));
   });
   return match ? match[0] : null;
-}
+};
 
 // TODO: will be a generic method that posts url of any type, picking the right endpoint to call
 const postUrlAndReply = async (
@@ -97,7 +97,7 @@ const postUrlAndReply = async (
   const validPfxs = Object.values(COLLECTIONS).flatMap(
     (collection) => collection.PFX
   );
-  const collectionKey = getKeyFromUrl(urlOrId);
+  const collectionKey: string | null = getKeyFromUrl(urlOrId);
   if (collectionKey === null) {
     msg = `please pass valid URL, one of: \n\n${validPfxs.join("\n")}`;
     return msg;
@@ -117,7 +117,7 @@ const postUrlAndReply = async (
     collectionKey.toUpperCase() as DataCollection
   );
   // console.log(`userCollectionRes: ${JSON.stringify(userCollectionRes)}`);
-  if (!userCollectionRes) {
+  if (!userCollectionRes?.databaseId) {
     msg = `please add databaseId for ${collectionKey} \nby calling /set_database_id ${collectionKey} your_notion_database_id`;
     return msg;
   }
@@ -129,10 +129,26 @@ const postUrlAndReply = async (
     telegramUserId: `${user.telegramId}`,
     notionDatabaseId: userCollectionRes.databaseId,
   };
+  msg = await postAddRow(params, collectionKey);
+  return msg;
+};
+
+const postAddRow = async (
+  params: {
+    url: string;
+    telegramChatId: string;
+    telegramUserId: string;
+    notionDatabaseId: string;
+  },
+  collectionKey: string
+): Promise<string> => {
+  let msg: string;
   console.debug(`params: ${JSON.stringify(params)}`);
   const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT + "_add_row";
   const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}`;
   console.debug(`url: ${url}`);
+
+  // post add_row request to API
   try {
     const response = await axios.post(url, {}, { params });
     console.log("response: " + JSON.stringify(response.data));
@@ -338,4 +354,6 @@ export {
   addUserCollection,
   getAndWarnDatabaseId,
   postUrlAndReply,
+  postAddRow,
+  getKeyFromUrl,
 };
