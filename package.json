@@ -33,9 +33,11 @@
   "homepage": "https://github.com/paulbroek/notion-utils-js#readme",
   "dependencies": {
     "@notionhq/client": "^2.2.1",
-    "@prisma/client": "^4.7.1",
+    "@prisma/client": "^4.11.0",
     "@types/jest": "^29.2.3",
     "@types/puppeteer": "^5.4.7",
+    "amqplib": "^0.10.3",
+    "axios": "^1.2.3",
     "dotenv": "^16.0.3",
     "input": "^1.0.1",
     "project-version": "^2.0.0",
@@ -58,7 +60,7 @@
     "lint-staged": "^13.0.4",
     "nodemon": "^2.0.20",
     "prettier-plugin-prisma": "^4.4.0",
-    "prisma": "^4.7.0",
+    "prisma": "^4.11.0",
     "ts-jest": "^29.0.3"
   },
   "husky": {

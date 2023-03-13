@@ -25,6 +25,8 @@ env:
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
   NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+  API_PORT: ${{ secrets.API_PORT }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   tsc:

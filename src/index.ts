@@ -20,7 +20,7 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 // (async () => getPage(pageId))();
 
 const deletePage = async (pageId: string) => {
-  // beset practice is to not actually delete, but set `archived` to true.
+  // best practice is to not actually delete, but set `archived` to true.
   // also safer for exposing Notion through Telegram, if anyone would get access to your bot.
   await notion.pages.update({ page_id: pageId, archived: true });
   console.log("page deleted");
@@ -134,6 +134,20 @@ interface Props {
   goodreadsUrl: string;
   databaseId: string;
 }
+
+// TODO: will become a generic method that can check if any item exists in any table
+const itemExistsInTable = async (props: Props): Promise<Boolean> => {
+  const response = await notion.databases.query({
+    database_id: props.databaseId,
+    filter: {
+      and: [{ property: "Goodreads URL", url: { equals: props.goodreadsUrl } }],
+    },
+  });
+  const resLen = response.results.length;
+  console.log("resLen: ", resLen);
+  return resLen ? true : false;
+};
+
 const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   const response = await notion.databases.query({
     database_id: props.databaseId,
@@ -146,6 +160,7 @@ const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   return resLen ? true : false;
 };
 
+// TODO: turn into generic method that can accept any form of data, matching the Collection type
 const addSummaryToTable = async (
   item: bookScrapeItem,
   databaseId: string
@@ -189,8 +204,8 @@ const addSummaryToTable = async (
               content: item.author,
               link: {
                 // TODO: inject author URL
-                // url: item.authorUrl,
-                url: "http://www.nu.nl",
+                url: item.authorUrl,
+                // url: "http://www.nu.nl",
               },
             },
           },

@@ -1,6 +1,6 @@
 import { connectTelegramClient, createTelegramClient } from ".";
 import { createBotCommandsSummary } from "../utils";
-import botCommands from "../bot-commands.json";
+import botCommands from "../data/bot-commands.json";
 
 const sessionKey: undefined | string = process.env
   .TELEGRAM_SESSION_KEY as string;

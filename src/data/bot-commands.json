@@ -6,12 +6,16 @@
     "description": "Get current database id"
   },
   {
+    "command": "get_user_collections",
+    "description": "Get user collections"
+  },
+  {
     "command": "set_database_id",
     "description": "Set current database id"
   },
   {
-    "command": "reset_database_id",
-    "description": "Reset database id"
+    "command": "reset_database_ids",
+    "description": "Reset database ids"
   },
   {
     "command": "delete",

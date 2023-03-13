@@ -18,25 +18,37 @@ model User {
   lastName     String?
   userName     String?
   languageCode String?
-  telegramId   BigInt   @unique
-  // telegramId   String   @unique
+  // telegramId   Int      @unique
+  // telegramId   BigInt   @unique
+  telegramId   String   @unique
   isBot        Boolean  @default(false)
   isPremium    Boolean? @default(false)
 
-  Message      Message[]
-  userSettings UserSettings?
+  Message Message[]
+
+  collections UserCollection[]
 
   @@index([telegramId, createdAt])
 }
 
-// save user settings, like database in use, how to reply to msgs, etc
-model UserSettings {
-  id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  databaseId String?
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String   @unique
+enum DataCollection {
+  GOODREADS
+  YOUTUBE
+  PODCHASER
+  MEETUP
+}
+
+model UserCollection {
+  id         String         @id @default(uuid())
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  collection DataCollection @unique
+  databaseId String?        @unique
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  // @@unique([collection, databaseId])
 }
 
 model Message {

@@ -1,145 +1,124 @@
-import { Context, Telegraf } from "telegraf";
+import { Context, Telegraf, Telegram } from "telegraf";
 import { Update } from "typegram";
-import scrapeBookRetry from "./scrape";
+
 import { createBotCommandsSummary } from "./utils";
-import { bookScrapeItem } from "./models/bookScrapeItem";
+
+import { DataCollection } from "@prisma/client";
+import { amqp_connect } from "./amqp_connect";
 import version from "project-version";
 import {
   upsertUser,
-  pushMessage,
-  updateUserSettings,
-  getUserSettings,
+  addUserCollection,
+  resetUserCollections,
+  getUserCollection,
+  getUserCollections,
+  getAndWarnDatabaseId,
+  postUrlAndReply,
 } from "./telegram";
-import {
-  addSummaryToTable,
-  bookExistsInTable,
-  databaseExistsForUser,
-  deleteLastSummary,
-  deleteSummaryById,
-} from ".";
-import botCommands from "./bot-commands.json";
+import { databaseExistsForUser, deleteLastSummary, deleteSummaryById } from ".";
+import botCommands from "./data/bot-commands.json";
+
+import { User as PrismaUser } from "@prisma/client";
+
+const NOT_IMPLEMENTED: string = "command not implemented yet";
 
 const bot: Telegraf<Context<Update>> = new Telegraf(
   process.env.TELEGRAM_BOT_TOKEN as string
 );
+// TODO: is this best approach? `Telegraf` only interacts with Telegram API. `Telegram` can send messages directly to any chatId
+const telegram: Telegram = new Telegram(
+  process.env.TELEGRAM_BOT_TOKEN as string
+);
 
-const NOT_IMPLEMENTED = "command not implemented yet";
-
-// TODO: turn into decorator that checks condition
-const getAndWarnDatabaseId = async (ctx): Promise<null | string> => {
-  const userSettings = await getUserSettings(ctx.from.id);
-  if (userSettings == null || !userSettings?.databaseId) {
-    ctx.reply(
-      "please set a databaseId first using\n /set_database_id YOUR_DATABASE_ID"
-    );
-    return null;
-  }
-
-  return userSettings.databaseId;
-};
+amqp_connect(bot, telegram);
 
 bot.start((ctx) => {
   ctx.reply("Hello " + ctx.from.first_name + "!");
 });
 
 bot.help((ctx) => {
-  // TODO: send list of all commands
+  const summary: string = createBotCommandsSummary(botCommands, true);
 
-  const summary = createBotCommandsSummary(botCommands, true);
+  // console.log("chat_id is: " + ctx.message.chat.id);
+  // console.log("summary: \n\n" + summary);
 
-  // ctx.reply("Send /start to receive a greeting");
-  console.log("chat_id is: " + ctx.message.chat.id);
-
-  console.log("summary: \n\n" + summary);
   ctx.reply("commands summary: \n\n" + summary);
 });
 
-const scrapeAndReply = async (ctx: Context, msg: string) => {
-  // check if databaseId is set
-  const databaseId = await getAndWarnDatabaseId(ctx);
-  if (databaseId == null) {
-    return;
-  }
-
-  // check if msg is valid URL or ask user
-  if (!msg.startsWith("https://www.goodreads.com/book/show/")) {
-    ctx.reply("please pass valid goodreads book URL");
-    return;
-  }
-  // throw away any url encoded queries
-  const goodreadsUrl: string = msg.split("?")[0];
-
-  if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
-    ctx.reply("Book already exists in summary database");
-    return;
-  }
-
-  // user feedback, send message when starting scrape process, delete it when finished / error
-  const { message_id } = await ctx.reply("scraping..");
-
-  const scrapeRes: null | bookScrapeItem = await scrapeBookRetry(goodreadsUrl);
-  // ctx.reply(`res: ${JSON.stringify(res)}`);
-  await ctx.deleteMessage(message_id);
-
-  // create notion page, ask user first
-  if (scrapeRes) {
-    const addResult = await addSummaryToTable(scrapeRes, databaseId);
-
-    if (!addResult) {
-      ctx.reply("could not add result to Notion");
-      // TODO: retry automatically?
-    } else {
-      // console.log("addResult: ", JSON.stringify(addResult));
-      // FIXME: very ugly method, but notion API does not allow to see properties of response directly
-      // See: https://github.com/makenotion/notion-sdk-js/issues/247
-
-      // const recreatedObject = JSON.parse(JSON.stringify(addResult));
-      // console.log("addResult.reparsed: ", recreatedObject.url);
-      // ctx.reply(`Done! Visit the summary at: \n${recreatedObject.url}`);
-      ctx.reply(`Done! Visit the summary at: \n${addResult["url"]}`);
-    }
-  } else {
-    ctx.reply("Could not scrape Goodreads page");
-  }
-};
-
 bot.command("get_current_database_id", async (ctx) => {
+  const msgs = ctx.update.message.text.split(" ");
+  if (msgs.length != 2) {
+    return ctx.reply(
+      "please pass a collection, example: \nget_current_database_id youtube"
+    );
+  }
+  const collection: DataCollection = msgs[1].toUpperCase() as DataCollection;
+
+  // check if collection exists
+  if (!Object.values(DataCollection).includes(collection)) {
+    return ctx.reply(
+      `Invalid collection name. Supported collections are: ${Object.values(
+        DataCollection
+      ).join(", ")}`
+    );
+  }
+  const userCollection = await getUserCollection(ctx.from.id, collection);
+
+  return ctx.reply("current databaseId: \n" + userCollection?.databaseId);
+});
+
+bot.command("get_user_collections", async (ctx) => {
   console.log("DATABASE_URL: ", process.env.DATABASE_URL);
-  const userSettings = await getUserSettings(ctx.from.id);
-  ctx.reply("current databaseId: \n" + userSettings?.databaseId);
+  const collections = await getUserCollections(ctx.from.id);
+
+  ctx.reply("current user collections: \n" + JSON.stringify(collections));
 });
 
 bot.command("set_database_id", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
-  // console.log("msgs: ", JSON.stringify(msgs));
-  if (msgs.length != 2) {
-    ctx.reply("please pass one databaseId");
-    return;
+  if (msgs.length != 3) {
+    return ctx.reply(
+      "please pass a collection and databaseId, example: \n\nset_database_id youtube 75f14122dabc4196c6f37f92b580bbfc"
+    );
   }
-  const databaseId = msgs[1];
-  // TODO: how to save this state when restarting bot?
-  // -> use DB to store user data
+  const collection: DataCollection = msgs[1].toUpperCase() as DataCollection;
+
+  // check if collection exists
+  if (!Object.values(DataCollection).includes(collection)) {
+    return ctx.reply(
+      `Invalid collection name. Supported collections are: ${Object.values(
+        DataCollection
+      ).join(", ")}`
+    );
+  }
+
+  const databaseId: string = msgs[2];
   // database exists for user?
   if (!(await databaseExistsForUser(databaseId))) {
-    ctx.reply("databaseId does not exist for user");
-    return;
+    return ctx.reply("databaseId does not exist for user");
   }
 
-  await updateUserSettings(ctx.from.id, { databaseId: databaseId });
+  const success: boolean = await addUserCollection(
+    ctx.from.id,
+    collection,
+    databaseId
+  );
 
-  ctx.reply("databaseId was set to: \n" + databaseId);
+  if (success) return ctx.reply("databaseId was set to: \n" + databaseId);
+
+  return ctx.reply("databaseId was not set");
 });
 
-bot.command("reset_database_id", async (ctx) => {
-  const newDatabaseId = null;
-  await updateUserSettings(ctx.from.id, { databaseId: newDatabaseId });
+bot.command("reset_database_ids", async (ctx) => {
+  const success: boolean = await resetUserCollections(ctx.from.id);
+  if (success) return ctx.reply("reset all databaseIds for user");
 
-  ctx.reply("databaseId was set to: \n" + newDatabaseId);
+  return ctx.reply("could not reset all databaseIds");
 });
 
 bot.command("nrow", async () => {
   // TODO: implement method
-  // get number of rows in database
+  // get number of rows in notion database
 });
 
 bot.command("repeat_last", async (ctx) => {
@@ -176,7 +155,7 @@ bot.command("delete", async (ctx) => {
   ctx.reply("deleted page: \n" + pageTitle);
 });
 
-// both plain messages and /add commands will add summaries to Notion
+// only /add commands will add summaries to Notion
 bot.command("add", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
   // console.log("msgs: ", JSON.stringify(msgs));
@@ -187,10 +166,19 @@ bot.command("add", async (ctx) => {
   const msg = msgs[1];
 
   // get or create user from DB
-  await upsertUser(ctx.message);
+  // TODO: should always run, for every endpoint
+  const user: PrismaUser | null = await upsertUser(ctx.message);
+  // TODO: implement pushMessage, save all messages to db
   // await pushMessage(ctx.from.id, ctx.update.message);
 
-  await scrapeAndReply(ctx, msg);
+  // calling api in background
+  if (user) {
+    const replyMsg: string = await postUrlAndReply(msg, user);
+    ctx.reply(replyMsg, { disable_web_page_preview: true });
+  }
+
+  // Either the item exists in db, you can immediately request AddRowToTable microservice, OR
+  // TODO: subscribe to RabbitMQ / feedback message should return to telegram chat when row got added
 });
 
 // bot.on("text", async (ctx) => {
