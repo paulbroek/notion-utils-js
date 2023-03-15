@@ -1,7 +1,7 @@
 version: "3.4"
 
 services:
-  telegram-bot:
+  telegram-bot-test:
     image: notion-utils-js
     container_name: notion-telegram-bot-test
     build:
