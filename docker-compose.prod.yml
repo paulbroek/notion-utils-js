@@ -4,6 +4,7 @@ services:
   telegram-bot-prod:
     image: notion-utils-js
     container_name: notion-telegram-bot-prod
+    # network_mode: host
     build:
       context: .
       dockerfile: ./Dockerfile
