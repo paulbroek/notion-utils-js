@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.9"
 
 services:
   telegram-bot-prod:
@@ -12,13 +12,29 @@ services:
     environment:
       NODE_ENV: production
     env_file:
-      - .env
-    command: ["node", "./dist/telegram-bot.js"]
+      # - .env
+      - .env.prod
+    # command: ["node", "./dist/telegram-bot.js"]
     # command: ["ts-node", "./src/telegram-bot.js"]
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
-  postgres:
+  add-content-service-prod:
+    image: notion-utils-js
+    container_name: add-content-service-prod
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+    env_file:
+      - .env.prod
+    command: ["node", "./dist/add-content-service.js"]
+    volumes:
+      - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
+
+  postgres-prod:
     image: postgres:15.1-alpine
     container_name: notion-telegram-postgres-prod
     restart: unless-stopped
