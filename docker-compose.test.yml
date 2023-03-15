@@ -1,9 +1,10 @@
-version: "3.4"
+version: "3.9"
 
 services:
-  telegram-bot:
+  telegram-bot-test:
     image: notion-utils-js
     container_name: notion-telegram-bot-test
+    # network_mode: host
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -17,9 +18,9 @@ services:
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
-  add-content-service:
+  add-content-service-test:
     image: notion-utils-js
-    container_name: add-content-service
+    container_name: add-content-service-test
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -32,7 +33,7 @@ services:
     volumes:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
-  postgres:
+  postgres-test:
     image: postgres:15.1-alpine
     container_name: notion-telegram-postgres-test
     restart: unless-stopped

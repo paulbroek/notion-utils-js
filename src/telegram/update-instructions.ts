@@ -5,12 +5,12 @@ import botCommands from "../data/bot-commands.json";
 const sessionKey: undefined | string = process.env
   .TELEGRAM_SESSION_KEY as string;
 const TELEGRAM_BOT_NAME: string = process.env.TELEGRAM_BOT_NAME as string;
-const TELEGRAM_BOT_NAME_TEST: string = process.env
-  .TELEGRAM_BOT_NAME_TEST as string;
+// const TELEGRAM_BOT_NAME_TEST: string = process.env
+//   .TELEGRAM_BOT_NAME_TEST as string;
 const CHAT_ID = "botfather";
 
-// const BOT_NAME = TELEGRAM_BOT_NAME;
-const BOT_NAME = TELEGRAM_BOT_NAME_TEST;
+const BOT_NAME = TELEGRAM_BOT_NAME;
+// const BOT_NAME = TELEGRAM_BOT_NAME_TEST;
 
 const client = createTelegramClient(sessionKey);
 
