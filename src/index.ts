@@ -148,6 +148,7 @@ const itemExistsInTable = async (props: Props): Promise<Boolean> => {
   return resLen ? true : false;
 };
 
+// TODO: make generic for any item type
 const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   const response = await notion.databases.query({
     database_id: props.databaseId,
@@ -204,8 +205,8 @@ const addSummaryToTable = async (
               content: item.author,
               link: {
                 // TODO: inject author URL
-                url: item.authorUrl,
-                // url: "http://www.nu.nl",
+                // url: item.authorUrl,
+                url: "http://www.nu.nl",
               },
             },
           },
