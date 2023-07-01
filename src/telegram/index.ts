@@ -103,7 +103,7 @@ const postUrlAndReply = async (
     return msg;
   }
   // TODO: make bookExists generic, check if table exists first
-  // if (await bookExistsInTable({ goodreadsUrl, databaseId })) {
+  // if (await bookExistsInTable({ urlOrId, databaseId })) {
   //   ctx.reply("Book already exists in summary database");
   //   return;
   // }

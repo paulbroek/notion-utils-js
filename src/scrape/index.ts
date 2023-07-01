@@ -103,7 +103,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
   // });
 
   const scrapeItem: null | bookScrapeItem = await page.evaluate(async function (
-    goodreadsUrl: string
+    url: string
   ) {
     // wait for element to be ready
     if (!document.querySelector("#coverImage")) {
@@ -151,7 +151,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       published,
       coverUrl: coverUrl === null ? defaultCoverUrl : coverUrl,
       // coverUrl,
-      goodreadsUrl,
+      url,
       authorUrl,
     };
 

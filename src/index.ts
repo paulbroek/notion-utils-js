@@ -1,3 +1,4 @@
+import { scrapeItem } from "./models/scrapeItem";
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -28,14 +29,14 @@ const deletePage = async (pageId: string) => {
 
 const deleteSummaryById = async (
   databaseId: string,
-  goodreadsUrl: string,
+  url: string,
   allowOnlyNonEdited = true
 ): Promise<string | undefined> => {
   const response = await notion.databases.query({
     database_id: databaseId,
     filter: {
       property: "Goodreads URL",
-      url: { equals: goodreadsUrl },
+      url: { equals: url },
     },
 
     page_size: 1,
@@ -131,7 +132,7 @@ const databaseExistsForUser = async (databaseId: string): Promise<boolean> => {
 };
 
 interface Props {
-  goodreadsUrl: string;
+  url: string;
   databaseId: string;
 }
 
@@ -140,7 +141,7 @@ const itemExistsInTable = async (props: Props): Promise<Boolean> => {
   const response = await notion.databases.query({
     database_id: props.databaseId,
     filter: {
-      and: [{ property: "Goodreads URL", url: { equals: props.goodreadsUrl } }],
+      and: [{ property: "url", url: { equals: props.url } }],
     },
   });
   const resLen = response.results.length;
@@ -153,12 +154,36 @@ const bookExistsInTable = async (props: Props): Promise<Boolean> => {
   const response = await notion.databases.query({
     database_id: props.databaseId,
     filter: {
-      and: [{ property: "Goodreads URL", url: { equals: props.goodreadsUrl } }],
+      and: [{ property: "url", url: { equals: props.url } }],
     },
   });
   const resLen = response.results.length;
   console.log("resLen: ", resLen);
   return resLen ? true : false;
+};
+
+const addGenericRowToTable = async (
+  item: scrapeItem,
+  databaseId: string
+): Promise<CreatePageResponse> => {
+  console.log("item: ", JSON.stringify(item));
+  const createPageResponse: CreatePageResponse = await notion.pages.create({
+    parent: { type: "database_id", database_id: databaseId },
+    properties: {
+      Title: {
+        title: [
+          {
+            text: {
+              content: item.title,
+            },
+          },
+        ],
+      },
+    },
+  });
+  // TODO: how to know what properties to add to the database?
+  console.log(createPageResponse);
+  return createPageResponse;
 };
 
 // TODO: turn into generic method that can accept any form of data, matching the Collection type
@@ -212,8 +237,8 @@ const addSummaryToTable = async (
           },
         ],
       },
-      "Goodreads URL": {
-        url: item.goodreadsUrl,
+      url: {
+        url: item.url,
         // url: "" + item.coverUrl,
       },
       // isbn: {

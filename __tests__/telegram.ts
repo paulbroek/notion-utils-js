@@ -48,7 +48,7 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
 
     // 1. Summary should not exist in table yet
     const toBeAddedBookExists: Boolean = await bookExistsInTable({
-      goodreadsUrl: BOOK_URL,
+      url: BOOK_URL,
       databaseId,
     });
     expect(toBeAddedBookExists).toEqual(false);

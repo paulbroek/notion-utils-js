@@ -1,9 +1,9 @@
-export interface bookScrapeItem {
+import { scrapeItem } from "./scrapeItem";
+
+export interface bookScrapeItem extends scrapeItem {
   author: string;
-  title: string;
   isbn?: string;
   published: string;
   coverUrl?: string;
-  goodreadsUrl: string;
   authorUrl: any;
 }

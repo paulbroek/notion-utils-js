@@ -140,10 +140,10 @@ bot.command("delete_last", async (ctx) => {
 bot.command("delete", async (ctx) => {
   const msgs = ctx.update.message.text.split(" ");
   if (msgs.length != 2) {
-    ctx.reply("please pass one bookId to delete");
+    ctx.reply("please pass one url to delete");
     return;
   }
-  const goodreadsUrl = msgs[1];
+  const url = msgs[1];
 
   const databaseId = await getAndWarnDatabaseId(ctx);
   if (databaseId == null) {
@@ -151,7 +151,7 @@ bot.command("delete", async (ctx) => {
   }
 
   // delete book summary
-  const pageTitle = await deleteSummaryById(databaseId, goodreadsUrl);
+  const pageTitle = await deleteSummaryById(databaseId, url);
   ctx.reply("deleted page: \n" + pageTitle);
 });
 
