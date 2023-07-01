@@ -17,8 +17,8 @@ test:
 bot:
 	docker rm -f notion-telegram-bot-test && \
 	docker-compose -f docker-compose.test.yml build && \
-	docker-compose -f docker-compose.test.yml up -d telegram-bot && \
-	docker-compose -f docker-compose.test.yml logs -f telegram-bot
+	docker-compose -f docker-compose.test.yml up -d telegram-bot-test && \
+	docker-compose -f docker-compose.test.yml logs -f telegram-bot-test
 
 # .PHONY: content-service
 # content-service:
