@@ -144,7 +144,7 @@ const postAddRow = async (
 ): Promise<string> => {
   let msg: string;
   console.debug(`params: ${JSON.stringify(params)}`);
-  const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT + "_add_row";
+  const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT;
   const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}`;
   console.debug(`url: ${url}`);
 
