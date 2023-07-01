@@ -61,7 +61,7 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
     const justAddedBookExists: Boolean = await periodicallyDoTillCondition(
       1000,
       bookExistsInTable,
-      { goodreadsUrl: BOOK_URL, databaseId },
+      { url: BOOK_URL, databaseId },
       true
     );
     expect(justAddedBookExists).toEqual(true);
@@ -71,7 +71,7 @@ test("Integration test: connect to Telegram, set databaseId, add Summary, and de
     const lastBookNotExists: Boolean = await periodicallyDoTillCondition(
       1000,
       bookExistsInTable,
-      { goodreadsUrl: BOOK_URL, databaseId },
+      { url: BOOK_URL, databaseId },
       false
     );
     expect(lastBookNotExists).toEqual(true);
