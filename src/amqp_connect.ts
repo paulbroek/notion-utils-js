@@ -76,7 +76,7 @@ export const amqp_connect = (
         channel.assertQueue(queue_to_scrape, { durable: false });
 
         console.log(
-          ` [*] Waiting for messages in ${queue_publish} and ${queue_to_scrape}. To exit press CTRL+C`
+          ` [*] Waiting for messages in '${queue_publish}' and '${queue_to_scrape}'. To exit press CTRL+C`
         );
 
         channel.consume(
