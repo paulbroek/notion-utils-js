@@ -5,7 +5,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 
-RUN npm install -g npm@9.3.1
+RUN npm install -g npm@9.7.2
 RUN npm install husky -g
 # install ts-node for easy pod debugging
 RUN npm install -g ts-node
