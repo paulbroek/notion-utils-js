@@ -33,18 +33,27 @@ const createBotCommandsSummary = (
 const enableTimestampedLogging = () => {
   const originalLog = console.log;
 
-  // Overwriting
+  // Overwriting console.* methods
   console.log = function () {
     const args = [].slice.call(arguments);
     originalLog.apply(console.log, [getCurrentDateString()].concat(args));
   };
 
+  console.debug = function () {
+    const args = [].slice.call(arguments);
+    originalLog.apply(console.log, [getCurrentDateString()].concat(args));
+  };
+
   // Returns current timestamp
+  console.error = function () {
+    const args = [].slice.call(arguments);
+    originalLog.apply(console.log, [getCurrentDateString()].concat(args));
+  };
+
   function getCurrentDateString() {
     return new Date().toISOString() + " ::";
   }
 };
-
 export {
   delay,
   periodicallyDoTillCondition,
