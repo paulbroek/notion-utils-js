@@ -30,4 +30,24 @@ const createBotCommandsSummary = (
   return res.join("\n");
 };
 
-export { delay, periodicallyDoTillCondition, createBotCommandsSummary };
+const enableTimestampedLogging = () => {
+  const originalLog = console.log;
+
+  // Overwriting
+  console.log = function () {
+    const args = [].slice.call(arguments);
+    originalLog.apply(console.log, [getCurrentDateString()].concat(args));
+  };
+
+  // Returns current timestamp
+  function getCurrentDateString() {
+    return new Date().toISOString() + " ::";
+  }
+};
+
+export {
+  delay,
+  periodicallyDoTillCondition,
+  createBotCommandsSummary,
+  enableTimestampedLogging,
+};

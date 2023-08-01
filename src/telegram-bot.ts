@@ -1,7 +1,7 @@
 import { Context, Telegraf, Telegram } from "telegraf";
 import { Update } from "typegram";
 
-import { createBotCommandsSummary } from "./utils";
+import { createBotCommandsSummary, enableTimestampedLogging } from "./utils";
 
 import { DataCollection } from "@prisma/client";
 import { amqp_connect } from "./amqp_connect";
@@ -19,6 +19,9 @@ import { databaseExistsForUser, deleteLastSummary, deleteSummaryById } from ".";
 import botCommands from "./data/bot-commands.json";
 
 import { User as PrismaUser } from "@prisma/client";
+
+// Enable timestamped logging
+enableTimestampedLogging();
 
 const NOT_IMPLEMENTED: string = "command not implemented yet";
 
