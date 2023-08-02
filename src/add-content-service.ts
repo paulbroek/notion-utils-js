@@ -105,22 +105,24 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
 
   // TODO: check if row exists in table?
   try {
-    const { item, notionDatabaseId } = message as {
+    const { item, collection, notionDatabaseId } = message as {
       item: scrapeItem;
       // item: bookScrapeItem;
+      collection: DataCollection;
       notionDatabaseId: string;
     };
 
     let addRowResult: CreatePageResponse;
 
     // determine what endpoint should be called based on collection type
-    switch (item.collection) {
-      case DataCollection.GOODREADS.toString():
+    switch (collection) {
+      // case DataCollection.GOODREADS.toString():
+      case DataCollection.GOODREADS:
         // unsafe?
         const bookItem = item as bookScrapeItem;
         addRowResult = await addSummaryToTable(bookItem, notionDatabaseId);
         break;
-      // case DataCollection.YOUTUBE.toString():
+      // case DataCollection.YOUTUBE:
       //   addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
       //   break;
       default:
