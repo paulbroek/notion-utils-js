@@ -1,6 +1,6 @@
 ENV_FILE=./.env.test
 
-CONTENT_SERVICE=add-content-service
+CONTENT_SERVICE=add-content-service-test
 # dc='docker-compose -f docker-compose.test.yml'
 COMPOSE_CONFIG=docker-compose.test.yml
 
