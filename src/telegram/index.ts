@@ -129,6 +129,7 @@ const postUrlAndReply = async (
     telegramUserId: `${user.telegramId}`,
     notionDatabaseId: userCollectionRes.databaseId,
     collection: collectionKey.toUpperCase() as DataCollection,
+    item: {},
   };
   msg = await postAddRow(params);
   return msg;

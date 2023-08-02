@@ -115,12 +115,12 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
 
     // determine what endpoint should be called based on collection type
     switch (item.collection) {
-      case DataCollection.GOODREADS:
+      case DataCollection.GOODREADS.toString():
         // unsafe?
         const bookItem = item as bookScrapeItem;
         addRowResult = await addSummaryToTable(bookItem, notionDatabaseId);
         break;
-      // case DataCollection.YOUTUBE:
+      // case DataCollection.YOUTUBE.toString():
       //   addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
       //   break;
       default:
