@@ -4,6 +4,7 @@ import axios from "axios";
 import { Update } from "typegram";
 
 import { postAddRow, getKeyFromUrl } from "./telegram/index";
+import { DataCollection } from "@prisma/client";
 
 const API_HOST: string = process.env.API_HOST as string;
 const API_PORT: string = process.env.API_PORT as string;
@@ -157,8 +158,9 @@ export const amqp_connect = (
                     telegramChatId: "-877077753",
                     telegramUserId: message.telegramUserId,
                     notionDatabaseId: message.databaseId,
+                    collection: collectionKey as DataCollection,
                   };
-                  msg = await postAddRow(params, collectionKey);
+                  msg = await postAddRow(params);
                   sendMessageToChat(bot, telegram, chatId, msg);
                   return;
                 }

@@ -1,5 +1,5 @@
 import { bookScrapeItem } from "./../models/bookScrapeItem";
-import { PrismaClient } from "@prisma/client";
+import { DataCollection, PrismaClient } from "@prisma/client";
 // from: https://github.com/dmtrbrl/goodreads-web-scraping/blob/master/index.js
 import puppeteer from "puppeteer";
 import { delay } from "../utils";
@@ -153,6 +153,7 @@ const scrapeBook = async (url: string): Promise<null | bookScrapeItem> => {
       // coverUrl,
       url,
       authorUrl,
+      collection: DataCollection.GOODREADS,
     };
 
     return res;

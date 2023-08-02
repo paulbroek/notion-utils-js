@@ -128,39 +128,49 @@ const postUrlAndReply = async (
     telegramChatId: "-877077753",
     telegramUserId: `${user.telegramId}`,
     notionDatabaseId: userCollectionRes.databaseId,
+    collection: collectionKey.toUpperCase() as DataCollection,
   };
-  msg = await postAddRow(params, collectionKey);
+  msg = await postAddRow(params);
   return msg;
 };
 
-const postAddRow = async (
-  params: {
-    url: string;
-    telegramChatId: string;
-    telegramUserId: string;
-    notionDatabaseId: string;
-  },
-  collectionKey: string
-): Promise<string> => {
+const postAddRow = async (params: {
+  url: string;
+  telegramChatId: string;
+  telegramUserId: string;
+  notionDatabaseId: string;
+  collection: DataCollection;
+}): Promise<string> => {
   let msg: string;
   console.debug(`params: ${JSON.stringify(params)}`);
-  const endpoint: string = COLLECTIONS[collectionKey].ENDPOINT;
+  const endpoint: string = COLLECTIONS[params.collection].ENDPOINT;
   const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}`;
   console.log(`calling url: ${url}`);
 
   // post add_row request to API
   try {
-    const response = await axios.post(url, {}, { params });
+    // const response = await axios.post(url, { body: params });
+    const response = await axios.post(url, params);
     console.log("response: " + JSON.stringify(response.data));
-    if (response.data.success) {
-      msg = "success";
-    }
-    return response.data.message;
+    // if (response.data.success) {
+    //   msg = "success";
+    //   return msg;
+    // }
+    // return response.data.message;
+    msg = "success";
+    return msg;
   } catch (error) {
     // TODO: do not output to user, but to issue list
     msg = "internal error calling api: " + error.response.body;
     console.log(msg);
-    console.log("error.message: " + error.message);
+    console.error(
+      `error.message=${error.message}, \nerror.response.status=${error.response.status} \nerror.response.data:`
+    );
+    console.log(error.response.data);
+    console.log(
+      "strsingified error.response.data: ",
+      JSON.stringify(error.response.data)
+    );
     return msg;
   }
 };

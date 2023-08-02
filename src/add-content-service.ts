@@ -4,6 +4,10 @@
 import amqp, { Channel, Connection } from "amqplib/callback_api";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { addSummaryToTable } from "./";
+import { enableTimestampedLogging } from "./utils";
+import { scrapeItem } from "./models/scrapeItem";
+import { DataCollection } from "@prisma/client";
+import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
 
 const RMQ_CONNECTION_URL = process.env.RMQ_URL;
 // const RMQ_CONSUME_QUEUE = process.env.RMQ_CONSUME_QUEUE;
@@ -13,6 +17,8 @@ const RMQ_PUBLISH_QUEUE = process.env.RMQ_PUBLISH_QUEUE;
 if (!RMQ_CONSUME_QUEUE) {
   throw new Error("RMQ_ADD_ROW_QUEUE environment variable is not set");
 }
+
+enableTimestampedLogging();
 
 let connection: Connection;
 let channel: Channel;
@@ -87,6 +93,8 @@ let channel: Channel;
 //   });
 // });
 
+// TODO: should be generic, support any collection type
+// TODO: and support any user
 const handleReceivedMessage = async (msg: amqp.Message | null) => {
   if (!msg) {
     return;
@@ -96,23 +104,38 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
   console.log(` [x] Received ${JSON.stringify(message)}`);
 
   // TODO: check if row exists in table?
-
-  // TODO: make generic, support any collection content type
-  // TODO: and make any user
   try {
-    const { item, databaseId } = message as {
-      item: bookScrapeItem;
-      databaseId: string;
+    const { item, notionDatabaseId } = message as {
+      item: scrapeItem;
+      // item: bookScrapeItem;
+      notionDatabaseId: string;
     };
-    const addSummaryResult = await addSummaryToTable(item, databaseId);
+
+    let addRowResult: CreatePageResponse;
+
+    // determine what endpoint should be called based on collection type
+    switch (item.collection) {
+      case DataCollection.GOODREADS:
+        // unsafe?
+        const bookItem = item as bookScrapeItem;
+        addRowResult = await addSummaryToTable(bookItem, notionDatabaseId);
+        break;
+      // case DataCollection.YOUTUBE:
+      //   addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
+      //   break;
+      default:
+        throw new Error(
+          `collection type not implemented for ${item.collection}`
+        );
+    }
 
     // If successful, publish message to RMQ_PUBLISH_QUEUE
     const publishChannel = await connection.createChannel();
     const publishQueue = RMQ_PUBLISH_QUEUE;
-    const publishMessage = JSON.stringify(addSummaryResult);
+    const publishMessage = JSON.stringify(addRowResult);
 
     publishChannel.assertQueue(publishQueue, { durable: false });
-    // combine the addSummaryResult with the parameters received from queue
+    // combine the addRowResult with the parameters received from queue
     const combinedPayload = Object.assign(
       {},
       { message: "successfully added row to Notion table!" },
