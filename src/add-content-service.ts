@@ -120,15 +120,14 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
       case DataCollection.GOODREADS:
         // unsafe?
         const bookItem = item as bookScrapeItem;
+        // TODO: check if bookItem not null
         addRowResult = await addSummaryToTable(bookItem, notionDatabaseId);
         break;
       // case DataCollection.YOUTUBE:
       //   addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
       //   break;
       default:
-        throw new Error(
-          `collection type not implemented for ${item.collection}`
-        );
+        throw new Error(`collection type not implemented for ${collection}`);
     }
 
     // If successful, publish message to RMQ_PUBLISH_QUEUE
@@ -148,7 +147,7 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
     publishChannel.sendToQueue(publishQueue, Buffer.from(combinedMessage));
     console.log(` [x] Sent \n\n${combinedMessage} \n\nto ${publishQueue}`);
   } catch (error) {
-    console.error(`Error adding summary to table: ${error.message}`);
+    console.error(`Error adding row to table: ${error.message}`);
   }
 
   // Acknowledge message receipt
