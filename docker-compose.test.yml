@@ -19,7 +19,8 @@ services:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
   add-content-service-test:
-    image: notion-utils-js
+    # image: notion-utils-js
+    # image: .
     container_name: add-content-service-test
     build:
       context: .
@@ -34,7 +35,7 @@ services:
       - ./src/scrape/scrapeItem.json:/tmp/scrapeItem.json
 
   postgres-test:
-    image: postgres:15.1-alpine
+    image: postgres:15.3-alpine
     container_name: notion-telegram-postgres-test
     restart: unless-stopped
     environment:

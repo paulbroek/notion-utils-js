@@ -186,6 +186,40 @@ const addGenericRowToTable = async (
   return createPageResponse;
 };
 
+const addYoutubeMetadataToTable = async (
+  item,
+  databaseId: string
+): Promise<CreatePageResponse> => {
+  console.error("item.authorUrl: ", JSON.stringify(item.authorUrl));
+  const response: CreatePageResponse = await notion.pages.create({
+    cover: {
+      type: "external",
+      external: {
+        url:
+          item.coverUrl ||
+          "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
+      },
+    },
+    parent: {
+      type: "database_id",
+      database_id: databaseId,
+    },
+    properties: {
+      Title: {
+        title: [
+          {
+            text: {
+              content: item.title,
+            },
+          },
+        ],
+      },
+    },
+  });
+  console.log(response);
+  return response;
+};
+
 // TODO: turn into generic method that can accept any form of data, matching the Collection type
 const addSummaryToTable = async (
   item: bookScrapeItem,
@@ -263,4 +297,5 @@ export {
   deleteLastSummary,
   deleteSummaryById,
   databaseExistsForUser,
+  addYoutubeMetadataToTable,
 };

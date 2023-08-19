@@ -5,5 +5,5 @@ export interface bookScrapeItem extends scrapeItem {
   isbn?: string;
   published: string;
   coverUrl?: string;
-  authorUrl: any;
+  authorUrl: string;
 }

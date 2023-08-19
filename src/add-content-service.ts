@@ -3,7 +3,7 @@
 
 import amqp, { Channel, Connection } from "amqplib/callback_api";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-import { addSummaryToTable } from "./";
+import { addSummaryToTable, addYoutubeMetadataToTable } from "./";
 import { enableTimestampedLogging } from "./utils";
 import { scrapeItem } from "./models/scrapeItem";
 import { DataCollection } from "@prisma/client";
@@ -104,6 +104,7 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
   console.log(` [x] Received ${JSON.stringify(message)}`);
 
   // TODO: check if row exists in table?
+  // TODO: get item by pg uuid, do not pass entire item in payload
   try {
     const { item, collection, notionDatabaseId } = message as {
       item: scrapeItem;
@@ -123,11 +124,17 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
         // TODO: check if bookItem not null
         addRowResult = await addSummaryToTable(bookItem, notionDatabaseId);
         break;
-      // case DataCollection.YOUTUBE:
-      //   addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
-      //   break;
+
+      case DataCollection.YOUTUBE:
+        // TODO: include type checking of pydantic model
+        // addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
+        addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
+        break;
+
       default:
-        throw new Error(`collection type not implemented for ${collection}`);
+        throw new Error(
+          `collection type not implemented for collection: ${collection}`
+        );
     }
 
     // If successful, publish message to RMQ_PUBLISH_QUEUE
