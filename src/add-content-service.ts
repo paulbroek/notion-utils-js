@@ -12,6 +12,7 @@ import { enableTimestampedLogging } from "./utils";
 import { scrapeItem } from "./models/scrapeItem";
 import { DataCollection } from "@prisma/client";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
+import { videoScrapeItem } from "./models/videoScrapeItem";
 
 const RMQ_CONNECTION_URL = process.env.RMQ_URL;
 // const RMQ_CONSUME_QUEUE = process.env.RMQ_CONSUME_QUEUE;
@@ -107,15 +108,15 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
   const message = JSON.parse(msg.content.toString() || "{}");
   console.log(` [x] Received ${JSON.stringify(message)}`);
 
-  try {
-    const { item, collection, notionDatabaseId } = message as {
-      item: scrapeItem;
-      // item: bookScrapeItem;
-      collection: DataCollection;
-      notionDatabaseId: string;
-    };
+  const { item, collection, notionDatabaseId } = message as {
+    item: scrapeItem;
+    // item: bookScrapeItem;
+    collection: DataCollection;
+    notionDatabaseId: string;
+  };
 
-    // TODO: check if row exists in table?
+  // TODO: check if row exists in table?
+  try {
     const existsInTable: Boolean = await violatesUniqueRows(
       item,
       collection,
@@ -125,7 +126,13 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
       channel.ack(msg);
       return;
     }
+  } catch (error) {
+    console.error(`Error verifying duplicate rows: ${error.message}`);
+    // channel.ack(msg);
+    return;
+  }
 
+  try {
     let addRowResult: CreatePageResponse;
 
     // determine what endpoint should be called based on collection type
@@ -141,7 +148,11 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
       case DataCollection.YOUTUBE:
         // TODO: include type checking of pydantic model
         // addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
-        addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
+        const videoItem = item as videoScrapeItem;
+        addRowResult = await addYoutubeMetadataToTable(
+          videoItem,
+          notionDatabaseId
+        );
         break;
 
       default:

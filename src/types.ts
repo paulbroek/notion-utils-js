@@ -1,9 +1,4 @@
-// import { DataCollection } from "./enums";
-
 import { DataCollection } from "@prisma/client";
-// type ValidPfx = {
-//   [key in DataCollection]: string;
-// };
 
 interface Collection {
   NAME: string;
@@ -27,7 +22,7 @@ export const COLLECTIONS: { [k in DataCollection]: Collection } = {
     PFX: ["https://www.youtube.com/watch?v=", "https://youtu.be/"],
     // ENDPOINT: "scrape/youtube",
     ENDPOINT: defaultEndpoint,
-    UNIQUE_COLUMN: "url",
+    UNIQUE_COLUMN: "URL",
   },
   [DataCollection.PODCHASER]: {
     NAME: "Podchaser",
@@ -44,5 +39,3 @@ export const COLLECTIONS: { [k in DataCollection]: Collection } = {
     UNIQUE_COLUMN: "url",
   },
 };
-
-// export { COLLECTIONS };

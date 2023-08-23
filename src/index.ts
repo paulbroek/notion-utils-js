@@ -4,6 +4,7 @@ import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
 import { COLLECTIONS } from "./types";
 import { DataCollection } from "@prisma/client";
+import { videoScrapeItem } from "./models/videoScrapeItem";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 // const pageId = process.env.NOTION_PAGE_ID as string;
@@ -189,16 +190,16 @@ const addGenericRowToTable = async (
 };
 
 const addYoutubeMetadataToTable = async (
-  item,
+  item: videoScrapeItem,
   databaseId: string
 ): Promise<CreatePageResponse> => {
-  console.error("item.authorUrl: ", JSON.stringify(item.authorUrl));
+  console.error("item.authorUrl: ", JSON.stringify(item.channelUrl));
   const response: CreatePageResponse = await notion.pages.create({
     cover: {
       type: "external",
       external: {
         url:
-          item.coverUrl ||
+          item.thumbnailUrl ||
           "https://upload.wikimedia.org/wikipedia/commons/6/62/Tuscankale.jpg",
       },
     },
@@ -215,6 +216,9 @@ const addYoutubeMetadataToTable = async (
             },
           },
         ],
+      },
+      URL: {
+        url: item.url,
       },
     },
   });
@@ -266,8 +270,8 @@ const addSummaryToTable = async (
               content: item.author,
               link: {
                 // TODO: inject author URL
-                // url: item.authorUrl,
-                url: "http://www.nu.nl",
+                url: item.authorUrl,
+                // url: "http://www.nu.nl",
               },
             },
           },
