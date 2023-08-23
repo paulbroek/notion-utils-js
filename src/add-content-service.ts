@@ -3,7 +3,11 @@
 
 import amqp, { Channel, Connection } from "amqplib/callback_api";
 import { bookScrapeItem } from "./models/bookScrapeItem";
-import { addSummaryToTable, addYoutubeMetadataToTable } from "./";
+import {
+  addSummaryToTable,
+  addYoutubeMetadataToTable,
+  violatesUniqueRows,
+} from "./";
 import { enableTimestampedLogging } from "./utils";
 import { scrapeItem } from "./models/scrapeItem";
 import { DataCollection } from "@prisma/client";
@@ -103,8 +107,6 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
   const message = JSON.parse(msg.content.toString() || "{}");
   console.log(` [x] Received ${JSON.stringify(message)}`);
 
-  // TODO: check if row exists in table?
-  // TODO: get item by pg uuid, do not pass entire item in payload
   try {
     const { item, collection, notionDatabaseId } = message as {
       item: scrapeItem;
@@ -112,6 +114,17 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
       collection: DataCollection;
       notionDatabaseId: string;
     };
+
+    // TODO: check if row exists in table?
+    const existsInTable: Boolean = await violatesUniqueRows(
+      item,
+      collection,
+      notionDatabaseId
+    );
+    if (existsInTable) {
+      channel.ack(msg);
+      return;
+    }
 
     let addRowResult: CreatePageResponse;
 

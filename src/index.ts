@@ -2,6 +2,8 @@ import { scrapeItem } from "./models/scrapeItem";
 import { Client } from "@notionhq/client";
 import { bookScrapeItem } from "./models/bookScrapeItem";
 import { CreatePageResponse } from "@notionhq/client/build/src/api-endpoints";
+import { COLLECTIONS } from "./types";
+import { DataCollection } from "@prisma/client";
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 // const pageId = process.env.NOTION_PAGE_ID as string;
@@ -291,6 +293,33 @@ const addSummaryToTable = async (
   return response;
 };
 
+const violatesUniqueRows = async (
+  // item: Item,
+  item: scrapeItem,
+  collection: DataCollection,
+  databaseId: string
+): Promise<Boolean> => {
+  const uniqueCol: string = COLLECTIONS[collection].UNIQUE_COLUMN;
+  const response = await notion.databases.query({
+    database_id: databaseId,
+    filter: {
+      property: uniqueCol,
+      rich_text: {
+        equals: item.url,
+      },
+    },
+  });
+
+  // console.log(`response length: ${JSON.stringify(response.results.length)}`);
+  if (response.results.length) {
+    console.error(
+      `item already exists in notion database for id_col '${uniqueCol}'`
+    );
+    return true;
+  }
+  return false;
+};
+
 export {
   addSummaryToTable,
   bookExistsInTable,
@@ -298,4 +327,5 @@ export {
   deleteSummaryById,
   databaseExistsForUser,
   addYoutubeMetadataToTable,
+  violatesUniqueRows,
 };
