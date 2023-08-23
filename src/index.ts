@@ -220,9 +220,31 @@ const addYoutubeMetadataToTable = async (
       URL: {
         url: item.url,
       },
+      Views: {
+        number: item.views,
+      },
+      Duration: {
+        number: Math.round(item.duration / 6) / 10,
+      },
+      Published: {
+        date: { start: item.published || "" },
+      },
+      Channel: {
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content: item.channelName,
+              link: {
+                url: item.channelUrl,
+              },
+            },
+          },
+        ],
+      },
     },
   });
-  console.log(response);
+  // console.log(response);
   return response;
 };
 
@@ -293,7 +315,7 @@ const addSummaryToTable = async (
     },
   });
 
-  console.log(response);
+  // console.log(response);
   return response;
 };
 

@@ -106,7 +106,9 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
   }
 
   const message = JSON.parse(msg.content.toString() || "{}");
-  console.log(` [x] Received ${JSON.stringify(message)}`);
+  console.log(
+    ` [x] Received from '${RMQ_CONSUME_QUEUE}': \n${JSON.stringify(message)}`
+  );
 
   const { item, collection, notionDatabaseId } = message as {
     item: scrapeItem;
@@ -137,7 +139,6 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
 
     // determine what endpoint should be called based on collection type
     switch (collection) {
-      // case DataCollection.GOODREADS.toString():
       case DataCollection.GOODREADS:
         // unsafe?
         const bookItem = item as bookScrapeItem;
@@ -147,7 +148,6 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
 
       case DataCollection.YOUTUBE:
         // TODO: include type checking of pydantic model
-        // addRowResult = await addYoutubeMetadataToTable(item, notionDatabaseId);
         const videoItem = item as videoScrapeItem;
         addRowResult = await addYoutubeMetadataToTable(
           videoItem,
@@ -176,7 +176,7 @@ const handleReceivedMessage = async (msg: amqp.Message | null) => {
     const combinedMessage = JSON.stringify(combinedPayload);
     // publishChannel.sendToQueue(publishQueue, Buffer.from(publishMessage));
     publishChannel.sendToQueue(publishQueue, Buffer.from(combinedMessage));
-    console.log(` [x] Sent \n\n${combinedMessage} \n\nto ${publishQueue}`);
+    console.log(` [x] Sent to '${publishQueue}': \n\n${combinedMessage}`);
   } catch (error) {
     console.error(`Error adding row to table: ${error.message}`);
   }
