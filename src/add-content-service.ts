@@ -98,7 +98,6 @@ let channel: Channel;
 //   });
 // });
 
-// TODO: should be generic, support any collection type
 // TODO: and support any user
 const handleReceivedMessage = async (msg: amqp.Message | null) => {
   if (!msg) {

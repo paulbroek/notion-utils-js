@@ -9,8 +9,8 @@ import { DataCollection } from "@prisma/client";
 const API_HOST: string = process.env.API_HOST as string;
 const API_PORT: string = process.env.API_PORT as string;
 
-const MAX_RETRIES = 5;
-const RETRY_TIMEOUT_MS = 5000;
+const MAX_RETRIES: number = 5;
+const RETRY_TIMEOUT_MS: number = 5000;
 
 console.log("rmq url: ", process.env.RMQ_URL);
 
@@ -123,6 +123,7 @@ export const amqp_connect = (
             const url: string = `http://${API_HOST}:${API_PORT}/${endpoint}?url_or_id=${message.url}`;
             console.debug(`url: ${url}`);
 
+            // TODO: make this service independent of chatbot service
             sendMessageToChat(
               bot,
               telegram,
@@ -130,6 +131,7 @@ export const amqp_connect = (
               "item does not exist in db, it is being collected"
             );
 
+            // TODO: inefficient, think of different approach. Reduce lines of code in this method
             // max 5 times check if item exists in db
             let retries = 0;
             while (retries < MAX_RETRIES) {

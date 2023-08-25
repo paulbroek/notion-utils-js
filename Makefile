@@ -1,6 +1,7 @@
 ENV_FILE=./.env.test
 
 CONTENT_SERVICE=add-content-service-test
+VERIFY_SCRAPED_SERVICE=verify-scraped-service-test
 # dc='docker-compose -f docker-compose.test.yml'
 COMPOSE_CONFIG=docker-compose.test.yml
 
@@ -30,6 +31,13 @@ content-service:
 	docker-compose -f docker-compose.test.yml build && \
 	docker-compose -f docker-compose.test.yml up -d $(CONTENT_SERVICE) && \
 	docker-compose -f docker-compose.test.yml logs -f $(CONTENT_SERVICE)
+
+.PHONY: verify-scraped-service
+verify-scraped-service:
+	docker rm -f $(VERIFY_SCRAPED_SERVICE) && \
+	docker-compose -f docker-compose.test.yml build && \
+	docker-compose -f docker-compose.test.yml up -d $(VERIFY_SCRAPED_SERVICE) && \
+	docker-compose -f docker-compose.test.yml logs -f $(VERIFY_SCRAPED_SERVICE)
 
 .PHONY: logs
 logs: 
