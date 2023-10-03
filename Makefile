@@ -2,8 +2,8 @@ ENV_FILE=./.env.test
 
 CONTENT_SERVICE=add-content-service-test
 VERIFY_SCRAPED_SERVICE=verify-scraped-service-test
-# dc='docker-compose -f docker-compose.test.yml'
-COMPOSE_CONFIG=docker-compose.test.yml
+# dc='docker compose -f docker compose.test.yml'
+COMPOSE_CONFIG_FILE=docker-compose.test.yml
 
 .PHONY: install
 install:
@@ -17,27 +17,27 @@ test:
 .PHONY: bot
 bot:
 	docker rm -f notion-telegram-bot-test && \
-	docker-compose -f docker-compose.test.yml build && \
-	docker-compose -f docker-compose.test.yml up -d telegram-bot-test && \
-	docker-compose -f docker-compose.test.yml logs -f telegram-bot-test
+	docker compose -f $(COMPOSE_CONFIG_FILE) build && \
+	docker compose -f $(COMPOSE_CONFIG_FILE) up -d telegram-bot-test && \
+	docker compose -f $(COMPOSE_CONFIG_FILE) logs -f telegram-bot-test
 
 # .PHONY: content-service
 # content-service:
-# 	docker rm -f $(CONTENT_SERVICE_NAME) && docker-compose -f $(COMPOSE_CONFIG) --build -d $(CONTENT_SERVICE_NAME) && docker-compose -f $(COMPOSE_CONFIG) logs -f $(CONTENT_SERVICE_NAME)
+# 	docker rm -f $(CONTENT_SERVICE_NAME) && docker compose -f $(COMPOSE_CONFIG) --build -d $(CONTENT_SERVICE_NAME) && docker compose -f $(COMPOSE_CONFIG) logs -f $(CONTENT_SERVICE_NAME)
 
 .PHONY: content-service
 content-service:
 	docker rm -f $(CONTENT_SERVICE) && \
-	docker-compose -f docker-compose.test.yml build && \
-	docker-compose -f docker-compose.test.yml up -d $(CONTENT_SERVICE) && \
-	docker-compose -f docker-compose.test.yml logs -f $(CONTENT_SERVICE)
+	docker compose -f $(COMPOSE_CONFIG_FILE) build && \
+	docker compose -f $(COMPOSE_CONFIG_FILE) up -d $(CONTENT_SERVICE) && \
+	docker compose -f $(COMPOSE_CONFIG_FILE) logs -f $(CONTENT_SERVICE)
 
 .PHONY: verify-scraped-service
 verify-scraped-service:
 	docker rm -f $(VERIFY_SCRAPED_SERVICE) && \
-	docker-compose -f docker-compose.test.yml build && \
-	docker-compose -f docker-compose.test.yml up -d $(VERIFY_SCRAPED_SERVICE) && \
-	docker-compose -f docker-compose.test.yml logs -f $(VERIFY_SCRAPED_SERVICE)
+	docker compose -f $(COMPOSE_CONFIG_FILE) build && \
+	docker compose -f $(COMPOSE_CONFIG_FILE) up -d $(VERIFY_SCRAPED_SERVICE) && \
+	docker compose -f $(COMPOSE_CONFIG_FILE) logs -f $(VERIFY_SCRAPED_SERVICE)
 
 .PHONY: logs
 logs: 
