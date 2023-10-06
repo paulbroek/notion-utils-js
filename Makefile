@@ -51,4 +51,4 @@ sync_env_to_here:
 	rsync -avz -e ssh $(SERVER_USER)@$(SERVER_ADDR):~/repos/notion-utils-js/.env.test ~/repos/notion-utils-js 
 
 sync_env_to_server:
-	rsync -avz -e ssh ~/repos/notion-utils-js/.env.test $(SERVER_USER)@$(SERVER_ADDR):~/repos/notion-utils-js/.env.test 
+	rsync -avz -e ssh ~/repos/notion-utils-js/.env.* $(SERVER_USER)@$(SERVER_ADDR):~/repos/notion-utils-js/ 

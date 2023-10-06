@@ -325,8 +325,8 @@ const violatesUniqueRows = async (
   collection: DataCollection,
   databaseId: string
 ): Promise<Boolean> => {
+  console.log(`collection=${collection}, databaseId=${databaseId}`);
   const uniqueCol: string = COLLECTIONS[collection].UNIQUE_COLUMN;
-  console.error(`uniqueCol=${uniqueCol}`);
   const response = await notion.databases.query({
     database_id: databaseId,
     filter: {
